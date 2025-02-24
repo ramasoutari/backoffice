@@ -1,0 +1,39 @@
+# Stage 1: Builder
+FROM node:20-bullseye AS builder
+
+# Use a temporary Yarn cache folder
+ENV YARN_CACHE_FOLDER=/tmp/yarn-cache
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy only package files first (better build caching)
+COPY package.json yarn.lock ./
+
+# Install dependencies (with fallback in case of failure)
+RUN set -e; \
+    if yarn install --frozen-lockfile; then \
+      echo "Dependencies installed successfully"; \
+    else \
+      echo "Warning: Fallback install with --force"; \
+      yarn install --force; \
+    fi && \
+    rm -rf $YARN_CACHE_FOLDER
+
+# Copy the rest of the application source code
+COPY . .
+
+# Build the React application for production
+RUN yarn build
+
+# Stage 2: Serve the React app using Nginx
+FROM nginx:alpine
+
+# Copy the production build from the builder stage into Nginx's html folder
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Expose port 80 to the outside world
+EXPOSE 80
+
+# Start Nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]

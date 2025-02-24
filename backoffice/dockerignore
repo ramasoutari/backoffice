@@ -1,0 +1,63 @@
+# Ignore dependencies (installed on the container)
+node_modules
+
+# Ignore build artifacts
+build/
+dist/
+.next/
+.turbo/
+.cache/
+
+# Ignore environment & config files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Ignore logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Ignore editor/system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Ignore Git metadata
+.git/
+.gitignore/
+
+
+
+On Sun, Feb 23, 2025 at 12:42 PM Qusai Fannoun <qusaifannoun@gmail.com> wrote:
+# Stage 1: Build the React application using Node 20
+FROM node:20-alpine as builder
+WORKDIR /backoffice
+
+# Copy package files for better caching
+COPY backoffice/package.json backoffice/yarn.lock ./
+
+# Install dependencies using Yarn
+RUN yarn install --frozen-lockfile
+
+# Copy the rest of your application code
+COPY backoffice ./
+
+# Build the React application for production
+RUN yarn build
+
+# Stage 2: Serve the React app using Nginx
+FROM nginx:alpine
+
+# Copy the production build from the builder stage into Nginx's html folder
+COPY --from=builder /backoffice/build /usr/share/nginx/html
+
+# Expose port 80 to the outside world
+EXPOSE 80
+
+# Start Nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]
