@@ -29,7 +29,7 @@ import {
   useSubmitApplication,
 } from "../../../api/appliactions.api";
 import { LoadingScreen } from "../../../components/loading-screen";
-import { HOST_API } from "../../../config-global";
+import { FILES_API, HOST_API } from "../../../config-global";
 import Iconify from "../../../components/iconify";
 
 const ApplicationDetails = ({ ApplicaitonNumber }) => {
@@ -283,12 +283,12 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
             </Typography>
             <Box display="flex" alignItems="center">
               {applicationInfo.environmantalAttachments.map(
-                (attachId, index) => (
+                (attach, index) => (
                   <Box key={index} display="flex" flexDirection="column" mr={1}>
                     <Button
                       onClick={() =>
                         window.open(
-                          `${HOST_API}/GetAttachment/${attachId.id}`,
+                          `${FILES_API}/${attach.fileName}`,
                           "_blank"
                         )
                       }
@@ -299,7 +299,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                         alignItems: "center",
                       }}
                     >
-                      <Typography px={0.5}>{attachId.fileName}</Typography>
+                      <Typography px={0.5}>{attach.fileName}</Typography>
                       <Iconify icon={"mdi:eye"} width={15} />
                     </Button>
                   </Box>
@@ -314,12 +314,12 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
               {t("soilTestAttachment")}:
             </Typography>
             <Box display="flex" alignItems="center">
-              {applicationInfo.soilAttachments.map((attachId, index) => (
+              {applicationInfo.soilAttachments.map((attach, index) => (
                 <Box key={index} display="flex" flexDirection="column" mr={1}>
                   <Button
                     onClick={() =>
                       window.open(
-                        `${HOST_API}/GetAttachment/${attachId.id}`,
+                        `${FILES_API}/${attach.fileName}`,
                         "_blank"
                       )
                     }
@@ -330,7 +330,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                       alignItems: "center",
                     }}
                   >
-                    <Typography px={0.5}>{attachId.fileName}</Typography>
+                    <Typography px={0.5}>{attach.fileName}</Typography>
                     <Iconify icon={"mdi:eye"} width={15} />
                   </Button>
                 </Box>
@@ -344,12 +344,12 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
               {t("noObjectionAttachment")}:
             </Typography>
             <Box display="flex" alignItems="center">
-              {applicationInfo.noObjectionAttachment.map((attachId, index) => (
+              {applicationInfo.noObjectionAttachment.map((attach, index) => (
                 <Box key={index} display="flex" flexDirection="column" mr={1}>
                   <Button
                     onClick={() =>
                       window.open(
-                        `${HOST_API}/GetAttachment/${attachId.id}`,
+                        `${FILES_API}/${attach.fileName}`,
                         "_blank"
                       )
                     }
@@ -360,7 +360,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                       alignItems: "center",
                     }}
                   >
-                    <Typography px={0.5}>{attachId.fileName}</Typography>
+                    <Typography px={0.5}>{attach.fileName}</Typography>
                     <Iconify icon={"mdi:eye"} width={15} />
                   </Button>
                 </Box>
@@ -368,18 +368,18 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
             </Box>
           </Box>
         )}
-        {applicationInfo.additional_attachments && (
+        {applicationInfo.extraAttachment && (
           <Box display="flex" flexDirection="column" alignItems="flex-start">
             <Typography fontWeight="500" p={1}>
               {t("additional_attachments")}:
             </Typography>
             <Box display="flex" alignItems="center">
-              {applicationInfo.soilAttachments.map((attachId, index) => (
+              {applicationInfo.extraAttachment.map((attach, index) => (
                 <Box key={index} display="flex" flexDirection="column" mr={1}>
                   <Button
                     onClick={() =>
                       window.open(
-                        `${HOST_API}/GetAttachment/${attachId.id}`,
+                        `${FILES_API}/${attach.fileName}`,
                         "_blank"
                       )
                     }
@@ -390,7 +390,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                       alignItems: "center",
                     }}
                   >
-                    <Typography px={0.5}>{attachId.fileName}</Typography>
+                    <Typography px={0.5}>{attach.fileName}</Typography>
                     <Iconify icon={"mdi:eye"} width={15} />
                   </Button>
                 </Box>
