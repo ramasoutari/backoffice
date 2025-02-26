@@ -33,7 +33,6 @@ import { HOST_API } from "../../../config-global";
 import Iconify from "../../../components/iconify";
 
 const ApplicationDetails = ({ ApplicaitonNumber }) => {
-  console.log("ApplicationNumber", ApplicaitonNumber);
   const [currentDialog, setCurrentDialog] = useState(-1);
   const [reason, setReason] = useState("");
   const [type, setType] = useState();
@@ -159,57 +158,110 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
 
   const handleSubmitReason = useCallback(() => {
     if (dialogType === "rejected") {
-      submitApplication.mutate({
-        ApplicaitonNumber,
-        currentDialog,
-        rejection_reason: reason,
-      });
+      submitApplication.mutate(
+        {
+          ApplicaitonNumber,
+          currentDialog,
+          rejection_reason: reason,
+        },
+        {
+          onSuccess: () => {
+            handleCloseDialog();
+            globalPrompt.onOpen({
+              type: "success",
+              content: (
+                <Stack direction="column" spacing={1}>
+                  <Typography
+                    component="h6"
+                    variant="h6"
+                    fontWeight="fontWeightBold"
+                  >
+                    {t("successfully_submitted")}
+                  </Typography>
+                </Stack>
+              ),
+              promptProps: {
+                icon: "success",
+              },
+            });
+          },
+        }
+      );
     } else if (dialogType === "edit") {
-      submitApplication.mutate({
-        ApplicaitonNumber,
-        currentDialog,
-        type: type,
-        title: title,
-      });
+      submitApplication.mutate(
+        {
+          ApplicaitonNumber,
+          currentDialog,
+          type,
+          title,
+        },
+        {
+          onSuccess: () => {
+            handleCloseDialog();
+            globalPrompt.onOpen({
+              type: "success",
+              content: (
+                <Stack direction="column" spacing={1}>
+                  <Typography
+                    component="h6"
+                    variant="h6"
+                    fontWeight="fontWeightBold"
+                  >
+                    {t("successfully_submitted")}
+                  </Typography>
+                </Stack>
+              ),
+              promptProps: {
+                icon: "success",
+              },
+            });
+          },
+        }
+      );
     }
-    handleCloseDialog();
-    globalPrompt.onOpen({
-      type: "success",
-      content: (
-        <Stack direction="column" spacing={1}>
-          <Typography component="h6" variant="h6" fontWeight="fontWeightBold">
-            {t("successfully_submitted")}
-          </Typography>
-        </Stack>
-      ),
-      promptProps: {
-        icon: "success",
-      },
-    });
-  }, [currentDialog, reason, title, type]);
-
+  }, [
+    ApplicaitonNumber,
+    currentDialog,
+    reason,
+    title,
+    type,
+    dialogType,
+    submitApplication,
+    handleCloseDialog,
+    globalPrompt,
+    t,
+  ]);
   const handleApprove = (buttonIndex) => {
     submitApplication.mutate(
       {
         ApplicaitonNumber,
         buttonIndex,
       },
-      {}
+      {},
+      {
+        onSuccess: () => {
+          globalPrompt.onOpen({
+            type: "success",
+            content: (
+              <Stack direction="column" spacing={1}>
+                <Typography
+                  component="h6"
+                  variant="h6"
+                  fontWeight="fontWeightBold"
+                >
+                  {t("successfully")}
+                </Typography>
+              </Stack>
+            ),
+            promptProps: {
+              icon: "success",
+            },
+          });
+        },
+      }
     );
-    globalPrompt.onOpen({
-      type: "success",
-      content: (
-        <Stack direction="column" spacing={1}>
-          <Typography component="h6" variant="h6" fontWeight="fontWeightBold">
-            {t("successfully")}
-          </Typography>
-        </Stack>
-      ),
-      promptProps: {
-        icon: "success",
-      },
-    });
   };
+
   if (!applicationInfo) return <LoadingScreen />;
 
   return (
