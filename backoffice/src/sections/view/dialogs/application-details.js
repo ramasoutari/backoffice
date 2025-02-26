@@ -159,30 +159,18 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
 
   const handleSubmitReason = useCallback(() => {
     if (dialogType === "rejected") {
-      submitApplication.mutate(
-        {
-          ApplicaitonNumber,
-          currentDialog,
-          rejection_reason: reason,
-        },
-        {
-          onSuccess: { handleCloseDialog },
-        }
-      );
+      submitApplication.mutate({
+        ApplicaitonNumber,
+        currentDialog,
+        rejection_reason: reason,
+      });
     } else if (dialogType === "edit") {
-      submitApplication.mutate(
-        {
-          ApplicaitonNumber,
-          currentDialog,
-          type: type,
-          title: title,
-        },
-        {
-          onSuccess: () => {
-            handleCloseDialog();
-          },
-        }
-      );
+      submitApplication.mutate({
+        ApplicaitonNumber,
+        currentDialog,
+        type: type,
+        title: title,
+      });
     }
     handleCloseDialog();
     globalPrompt.onOpen({
@@ -201,7 +189,13 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
   }, [currentDialog, reason, title, type]);
 
   const handleApprove = (buttonIndex) => {
-    submitApplication.mutate(ApplicaitonNumber, buttonIndex, {});
+    submitApplication.mutate(
+      {
+        ApplicaitonNumber,
+        buttonIndex,
+      },
+      {}
+    );
     globalPrompt.onOpen({
       type: "success",
       content: (

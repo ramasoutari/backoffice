@@ -27,8 +27,7 @@ export default function NavVertical({ openNav, onCloseNav }) {
   const pathname = usePathname();
   const direction = i18n.language === "ar" ? "ltr" : "ltr";
   const lgUp = useResponsive("up", "lg");
-    const smUp = useResponsive("up", "sm");
-
+  const smUp = useResponsive("up", "sm");
 
   const navData = useNavData();
   useEffect(() => {
@@ -58,7 +57,6 @@ export default function NavVertical({ openNav, onCloseNav }) {
         />
 
         <Box sx={{ flexGrow: 1 }} />
-
       </Scrollbar>
     </Box>
   );
@@ -69,8 +67,8 @@ export default function NavVertical({ openNav, onCloseNav }) {
       sx={{
         flexShrink: { lg: 0 },
         width: { lg: NAV.W_VERTICAL },
-        borderTopRightRadius: "24px",
-        borderBottomRightRadius: "24px",
+        borderTopLeftRadius: "24px",
+        borderBottomLeftRadius: "24px",
         backgroundColor: "background.paper",
         boxShadow: (theme) => theme.customShadows.z20,
         zIndex: 1001,
@@ -80,7 +78,7 @@ export default function NavVertical({ openNav, onCloseNav }) {
       {/* <NavToggleButton /> */}
 
       {lgUp ? (
-        <Box sx={{ direction, height:"728px" }}>
+        <Box sx={{ direction, height: "728px" }}>
           <Stack
             sx={{
               height: 1,

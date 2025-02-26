@@ -178,6 +178,7 @@ export default function Header({ onOpenNav }) {
       <AppBar
         // position="absolute"
         sx={{
+          right: NAV.W_VERTICAL,
           height: HEADER.H_MOBILE,
           paddingBottom: 12,
           zIndex: theme.zIndex.appBar + 1,

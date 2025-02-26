@@ -30,14 +30,24 @@ export function useGetApplication() {
   });
 }
 export async function submitApplication(data) {
+  console.log("data", data);
   return await axiosInstance
     .post(
-      `/workflow/${data.ApplicaitonNumber}/transition?choice=${data.currentDialog}`,
-      {
-        rejection_reason: data.rejection_reason,
-        type: data.fieldType,
-        title: data.label,
-      }
+      `/workflow/${data.ApplicaitonNumber}/transition?choice=${
+        data.currentDialog || data.buttonIndex
+      }`,
+      data.rejection_reason
+        ? {
+            rejection_reason: data.rejection_reason,
+          }
+        : data.type || data.title
+        ? [
+            {
+              type: data.type,
+              title: data.title,
+            },
+          ]
+        : null
     )
     .then((response) => response.data);
 }
