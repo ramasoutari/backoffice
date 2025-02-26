@@ -28,34 +28,34 @@ const ApplicationsView = () => {
   }, [user?.departmentId]);
 
   const buttons = [
-    { title: "جميع الطلبات", color: "#D4AF37" },
+    { title: "الكل", color: "#D4AF37" },
     {
-      title: "الطلبات الجديدة",
+      title: "جديد",
       color: "#000000",
       status: "SUBMITTED",
     },
     {
-      title: "الطلبات قيد العمل",
+      title: "قيد العمل",
       color: "#2E8B57",
       status: "IN_PROGRESS",
     },
     {
-      title: "الطلبات اللتي بحاجة لمعلومات الاضافية",
+      title: "بحاجة لمعلومات الاضافية",
       color: "#C2B280",
       status: "EXTRA_INFO",
     },
     {
-      title: "الطلبات الكشف الميداني",
+      title: "الكشف الميداني",
       color: "#005691",
       status: "INSPECTION",
     },
     {
-      title: "الطلبات المرفوضة",
+      title: "مرفوض",
       color: "#CC5500",
       status: "DECLINED",
     },
     {
-      title: "الطلبات الموافق عليها",
+      title: "الموافق عليها",
       color: "#4F4F4F",
       status: "ACCEPTED",
     },

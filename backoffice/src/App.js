@@ -18,6 +18,7 @@ import ThemeProvider from "./theme";
 import { MotionLazy } from "./animate/motion-lazy";
 import ReactQueryProvider from "./providers/react-query-provider";
 import { AuthConsumer } from "./auth/context/auth-consumer";
+import "./index.css"
 
 // ----------------------------------------------------------------------
 
