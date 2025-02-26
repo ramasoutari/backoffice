@@ -32,32 +32,32 @@ const ApplicationsView = () => {
     {
       title: "الطلبات الجديدة",
       color: "#000000",
-      status: "SUBMITTED",
+      status: "Submitted",
     },
     {
       title: "الطلبات قيد العمل",
       color: "#2E8B57",
-      status: "IN_PROGRESS",
+      status: "InProgress",
     },
     {
       title: "الطلبات اللتي بحاجة لمعلومات الاضافية",
       color: "#C2B280",
-      status: "EXTRA_INFO",
+      status: "ExtraInfo",
     },
     {
       title: "الطلبات الكشف الميداني",
       color: "#005691",
-      status: "INSPECTION",
+      status: "Inspection",
     },
     {
       title: "الطلبات المرفوضة",
       color: "#CC5500",
-      status: "DECLINED",
+      status: "Declined",
     },
     {
       title: "الطلبات الموافق عليها",
       color: "#4F4F4F",
-      status: "ACCEPTED",
+      status: "Accepted",
     },
   ];
 

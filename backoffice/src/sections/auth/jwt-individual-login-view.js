@@ -75,7 +75,7 @@ export default function JwtIndividualLoginView() {
           login(res.sessionId, res.token);
         },
         onError: (error) => {
-          if (error.status === 401) {
+          if (error.status === 401 || error.status === 404) {
             setErrorMsg(t("wrong_credentials"));
           } else {
             setErrorMsg(error.message);
