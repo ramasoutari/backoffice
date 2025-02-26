@@ -59,3 +59,13 @@ export const ClinicStatus = {
 };
 
 export const DWT_DEMO_AUTH_TOKEN = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhMjE4YWE0Zi1mMjkyLTQzOWYtOTk2ZC03ODRkZjhjYWE4OWIiLCJuYW1laWQiOiI4NjBjMzJhNS1hOWU2LTRiZmUtYmIxNy1hNGE4MGFkMzJmZjMiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIiwiZW1haWwiOiJkd3RAZHd0LmpvIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIlVzZXIiLCJBZG1pbiIsIkRldmVsb3BlciIsIlN1cGVyQWRtaW4iXSwiZXhwIjoxNzIyNDE5ODMxLCJpc3MiOiJVbml2ZXJzYWxBUEkiLCJhdWQiOiJVbml2ZXJzYWxBUEkifQ.99E5HlkaIz3svEoR71sCWzheoiy6n1RKilrbsDIsB34`;
+
+
+// export const AppStatus = {
+//   SUBMITTED : '001',
+//   IN_PROGRESS : '002',
+//   EXTRA_INFO : '003',
+//   INSPECTION : '004',
+//   DECLINED : '005',
+//   ACCEPTED : '006',
+// }

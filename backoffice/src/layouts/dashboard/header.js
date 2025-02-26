@@ -23,15 +23,15 @@ import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router";
 import HelpButton from "../_common/help-button";
 import { useAuthContext } from "../../auth/hooks";
-import { useTranslation } from "react-i18next";
 import { useSettingsContext } from "../../components/settings/context";
 import { useResponsive } from "../../hooks/use-responsive";
 import { bgBlur } from "../../theme/css";
 import { useOffSetTop } from "../../hooks/use-off-set-top";
-import NavSectionHorizontal from "../../components/nav-section/horizontal/nav-section-horizontal";
-import SvgColor from "../../components/svg-color";
-import Logo from "../../components/logo";
 import i18n from "../../locales/i18n";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import TranslateIcon from "@mui/icons-material/Translate";
 
 // ----------------------------------------------------------------------
 
@@ -61,28 +61,15 @@ export default function Header({ onOpenNav }) {
   const renderContent = (
     <>
       <Stack flexGrow={1} direction="row" alignItems="center">
-        {lgUp && isNavHorizontal && <Logo sx={{ mr: 2, height: 20 }} />}
-
-        {!lgUp && (
-          <Box
-            dir={direction}
-            data-tour-id="nav-toggle"
-            sx={{
-              dir: direction,
-            }}
-          >
-            <IconButton
-              onClick={onOpenNav}
-              sx={{
-                direction,
-              }}
-            >
-              <SvgColor
-                id="nav-toggle-btn"
-                src="/assets/icons/navbar/ic_menu_item.svg"
-              />
+        {smUp && (
+          <>
+            <IconButton aria-label="account" color="primary">
+              <AccountCircleIcon />
             </IconButton>
-          </Box>
+            <IconButton aria-label="notification" color="primary">
+              <NotificationsIcon />
+            </IconButton>
+          </>
         )}
 
         {/* <button
@@ -135,19 +122,19 @@ export default function Header({ onOpenNav }) {
         {user && <AccountPopover />}
       </Stack>
       {lgUp && (
-        <Box dir={direction} sx={{direction}}>
+        <Box dir={direction} sx={{ direction }}>
           <Stack
             flexGrow={1}
             direction="row"
             alignItems="center"
             justifyContent="center"
           >
-            <NavSectionHorizontal
+            {/* <NavSectionHorizontal
               data={navData}
               config={{
                 currentRole: user?.role || "admin",
               }}
-            />
+            /> */}
           </Stack>
         </Box>
       )}
@@ -157,7 +144,6 @@ export default function Header({ onOpenNav }) {
         direction="row"
         alignItems="center"
         justifyContent="flex-end"
-        spacing={{ xs: 0.5, sm: 1, lg: 6 }}
       >
         {/* {process.env.REACT_APP_ENVIRONMENT !== "production" && (
           <LanguagePopover />
@@ -171,27 +157,18 @@ export default function Header({ onOpenNav }) {
 
         {/* <Searchbar /> */}
 
-        {smUp && <DateTimeOverview />}
+        {/* {smUp && <DateTimeOverview />} */}
 
-        {/* 
         {smUp && (
-          <Box
-            component="div"
-            sx={{
-              width: "95px",
-              height: "auto",
-            }}
-          >
-            <img
-              src="/logo/masar-logo.png"
-              alt="MoH Logo"
-              style={{
-                width: "auto",
-                // height: '100%',
-              }}
-            />
-          </Box>
-        )} */}
+          <>
+            <IconButton aria-label="help" color="primary">
+              <HelpOutlineIcon />
+            </IconButton>
+            <IconButton aria-label="language" color="primary">
+              <TranslateIcon />
+            </IconButton>
+          </>
+        )}
       </Stack>
     </>
   );
@@ -220,7 +197,6 @@ export default function Header({ onOpenNav }) {
               borderBottom: `1px solid ${theme.palette.divider}`,
             }),
             ...(isNavHorizontal && {
-              width: 1,
               bgcolor: "common.white",
               height: HEADER.H_DESKTOP_OFFSET,
               borderBottom: `1px solid ${"#1D3E6E"}`,

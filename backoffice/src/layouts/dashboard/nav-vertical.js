@@ -27,13 +27,14 @@ export default function NavVertical({ openNav, onCloseNav }) {
   const pathname = usePathname();
   const direction = i18n.language === "ar" ? "ltr" : "ltr";
   const lgUp = useResponsive("up", "lg");
+    const smUp = useResponsive("up", "sm");
+
 
   const navData = useNavData();
   useEffect(() => {
     if (openNav) {
       onCloseNav();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
   const renderContent = (
     <Box sx={{ direction }}>
@@ -48,7 +49,7 @@ export default function NavVertical({ openNav, onCloseNav }) {
           },
         }}
       >
-        <Logo sx={{ padding:3}} />
+        <Logo sx={{ padding: 3 }} />
         <NavSectionVertical
           data={navData}
           config={{
@@ -58,7 +59,6 @@ export default function NavVertical({ openNav, onCloseNav }) {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* <NavUpgrade /> */}
       </Scrollbar>
     </Box>
   );
@@ -72,21 +72,21 @@ export default function NavVertical({ openNav, onCloseNav }) {
         borderTopRightRadius: "24px",
         borderBottomRightRadius: "24px",
         backgroundColor: "background.paper",
-        // boxShadow: (theme) => theme.customShadows.z20,
-        zIndex: 1101,
+        boxShadow: (theme) => theme.customShadows.z20,
+        zIndex: 1001,
         direction,
       }}
     >
-      <NavToggleButton />
+      {/* <NavToggleButton /> */}
 
       {lgUp ? (
-        <Box sx={{ direction }}>
+        <Box sx={{ direction, height:"728px" }}>
           <Stack
             sx={{
               height: 1,
               position: "fixed",
               width: NAV.W_VERTICAL,
-              // borderRight: (theme) => `dashed 1px ${theme.palette.divider}`,
+              borderRight: (theme) => `dashed 1px ${theme.palette.divider}`,
             }}
           >
             {renderContent}

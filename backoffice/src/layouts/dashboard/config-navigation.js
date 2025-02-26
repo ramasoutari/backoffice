@@ -2,6 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useAuthContext } from "../../auth/hooks";
 import { paths } from "../../routes/paths";
 import { useLocales } from "../../locales";
+import usePermissions from "../../hooks/use-permissions";
 
 // ----------------------------------------------------------------------
 
@@ -10,32 +11,43 @@ import { useLocales } from "../../locales";
 export function useNavData() {
   const { user } = useAuthContext();
   const { t } = useLocales();
+  const { hasPermission } = usePermissions();
 
   const getMenuItems = useCallback(() => {
     if (user) {
+      console.log("userrr", user.permissions);
       return [
-        {
-          title: t("my_orders"),
+        hasPermission("APPLICATION:READ") && {
+          title: t("dashboard"),
           path: paths.dashboard.root,
           auth: true,
           border: true,
           "data-tour-id": "my_orders_btn",
         },
-        {
+        hasPermission("APPLICATION:READ") && {
           title: t("applications"),
-          path: paths.dashboard.applications.root,
+          path: paths.dashboard.applications,
           auth: true,
           border: true,
-          "data-tour-id": "applicatios_btn",
+          "data-tour-id": "applications_btn",
         },
-        {
+        (hasPermission("SUPER_ADMIN:ALL_ACCESS") ||
+          hasPermission("USERS:CREAT")) && {
           title: t("users"),
-          path: paths.dashboard.users.root,
+          path: paths.dashboard.users,
           auth: true,
           border: true,
-          "data-tour-id": "applicatios_btn",
+          "data-tour-id": "users_btn",
         },
-      ];
+        (hasPermission("SUPER_ADMIN:ALL_ACCESS") ||
+          hasPermission("ENTITY:READ")) && {
+          title: t("entities"),
+          path: paths.dashboard.entities,
+          auth: true,
+          border: true,
+          "data-tour-id": "entities_btn",
+        },
+      ].filter(Boolean);
     } else {
       return [
         {
@@ -44,23 +56,9 @@ export function useNavData() {
           guest: true,
           border: true,
         },
-        {
-          title: t("applications"),
-          path: paths.dashboard.applications,
-          auth: true,
-          border: true,
-          "data-tour-id": "applicatios_btn",
-        },
-        {
-          title: t("users"),
-          path: paths.dashboard.users,
-          auth: true,
-          border: true,
-          "data-tour-id": "applicatios_btn",
-        },
       ];
     }
-  }, [t]);
+  }, [t, user, hasPermission]);
 
   const data = useMemo(
     () => [

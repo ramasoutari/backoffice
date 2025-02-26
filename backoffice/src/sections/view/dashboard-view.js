@@ -23,29 +23,49 @@ const DahboardView = () => {
   });
 
   const buttons = [
-    { title: "جميع الطلبات", count: applicationCounts.all, color: "#C06F34" },
-    { title: "الطلبات الجديدة", count: applicationCounts.new, color: "green" },
+    { title: "جميع الطلبات", color: "#D4AF37", count: 2 },
     {
-      title: "الطلبات الموافق عليها",
-      count: applicationCounts.approved,
-      color: "#FF4242",
+      title: "الطلبات الجديدة",
+      color: "#000000",
+      status: "SUBMITTED",
+      count: 4,
+    },
+    {
+      title: "الطلبات قيد العمل",
+      color: "#2E8B57",
+      status: "IN_PROGRESS",
+      count: 8,
+    },
+    {
+      title: "الطلبات اللتي بحاجة لمعلومات الاضافية",
+      color: "#C2B280",
+      status: "EXTRA_INFO",
+      count: 6,
+    },
+    {
+      title: "الطلبات الكشف الميداني",
+      color: "#005691",
+      status: "INSPECTION",
+      count: 9,
     },
     {
       title: "الطلبات المرفوضة",
-      count: applicationCounts.rejected,
-      color: "#E5A023",
+      color: "#CC5500",
+      status: "DECLINED",
+      count: 10,
     },
     {
-      title: "الطلبات المعادة",
-      count: applicationCounts.returned,
-      color: "#1D3E6E",
+      title: "الطلبات الموافق عليها",
+      color: "#4F4F4F",
+      status: "ACCEPTED",
+      count: 5,
     },
   ];
 
   const chartData = buttons.map((button) => ({
     title: button.title,
     value: button.count,
-    color: button.color, // Add color to chart data
+    color: button.color,
   }));
 
   const commonChartSettings = {
@@ -97,7 +117,7 @@ const DahboardView = () => {
       <Card sx={{ padding: 2 }}>
         <Stack
           direction="row"
-          spacing={2}
+          spacing={1}
           justifyContent="center"
           sx={{ mb: 3 }}
         >
@@ -105,7 +125,7 @@ const DahboardView = () => {
             <Button
               key={index}
               sx={{
-                width: "196.83px",
+                width: "165.83px",
                 height: "41.48px",
                 bgcolor: button.color,
                 borderRadius: "8px",
@@ -117,7 +137,7 @@ const DahboardView = () => {
                 },
               }}
             >
-              {button.title} ({button.count})
+              {button.title}
             </Button>
           ))}
         </Stack>

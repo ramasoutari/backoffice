@@ -1,15 +1,12 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // components
 //
-import { AuthContext } from './auth-context';
-import { SplashScreen } from '../../components/loading-screen';
+import { AuthContext } from "./auth-context";
+import { SplashScreen } from "../../components/loading-screen";
 
 // ----------------------------------------------------------------------
 
 export function AuthConsumer({ children }) {
-
-
-
   return (
     <AuthContext.Consumer>
       {(auth) => (auth.loading ? <SplashScreen /> : children)}

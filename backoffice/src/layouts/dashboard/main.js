@@ -31,15 +31,13 @@ export default function Main({ children, sx, ...other }) {
         sx={{
           minHeight: 1,
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           // mt: 4,
           pt: pageSpacing ? `${HEADER.H_MOBILE + 24 + 0}px` : `${24 + HEADER.H_MOBILE}px`,
-          pb: pageSpacing ? 10 : 0,
           ...(lgUp && {
             pt: pageSpacing
               ? `${HEADER.H_MOBILE * 2 + 40}px`
               : `${HEADER.H_MOBILE * (settings.hideNav ? 1 : 2)}px`,
-            pb: pageSpacing ? 15 : 0,
           }),
         }}
       >

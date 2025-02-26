@@ -26,10 +26,9 @@ export default function CompactLayout({ children }) {
         <Header onOpenNav={nav.onTrue} />
         <Box
           sx={{
-            minHeight: 1,
             display: "flex",
             direction,
-            // flexDirection: { xs: "column", md: "row" },
+            flexDirection: { xs: "column", md: "row" },
           }}
         >
           {renderNavVertical}

@@ -16,6 +16,8 @@ import { LocalizationProvider, useLocales } from "./locales";
 import { GlobalStyles } from "@mui/material";
 import ThemeProvider from "./theme";
 import { MotionLazy } from "./animate/motion-lazy";
+import ReactQueryProvider from "./providers/react-query-provider";
+import { AuthConsumer } from "./auth/context/auth-consumer";
 
 // ----------------------------------------------------------------------
 
@@ -28,83 +30,85 @@ export default function App() {
 
   return (
     <>
-      <LocalizationProvider>
-        <SettingsProvider
-          defaultSettings={{
-            themeMode: "light", // 'light' | 'dark'
-            themeDirection: "ltr", //  'rtl' | 'ltr'
-            themeContrast: "default", // 'default' | 'bold'
-            themeLayout: "horizontal", // 'vertical' | 'horizontal' | 'mini'
-            themeColorPresets: "orange", // 'default' | 'patron' | 'jiacc' | 'moh' | 'cyan' | 'purple' | 'blue' | 'orange' | 'red'
-            themeStretch: false,
-          }}
-        >
-          <AccessibilityProvider
+      <ReactQueryProvider>
+        <LocalizationProvider>
+          <SettingsProvider
             defaultSettings={{
-              rootFontSize: 100,
-              colorBlind: false,
+              themeMode: "light", // 'light' | 'dark'
+              themeDirection: "ltr", //  'rtl' | 'ltr'
+              themeContrast: "default", // 'default' | 'bold'
+              themeLayout: "vertical", // 'vertical' | 'horizontal' | 'mini'
+              themeColorPresets: "orange", // 'default' | 'patron' | 'jiacc' | 'moh' | 'cyan' | 'purple' | 'blue' | 'orange' | 'red'
+              themeStretch: false,
             }}
           >
-            <ThemeProvider>
-              <GlobalStyles
-                styles={{
-                  ".stickyTableCell": {
-                    position: "sticky !important",
-                    boxShadow: "5px 2px 5px grey !important",
-                  },
-                  ".react-joyride__tooltip, .react-joyride__tooltip *": {
-                    fontFamily: "Droid Arabic Kufi",
-                  },
-                  "#showModal": {
-                    position: "fixed",
-                  },
-                  "#custom-modal": {
-                    zIndex: 50000,
-                  },
-                  "#custom-modal *": {
-                    zIndex: 50000,
-                  },
-                  "modal-backdrop.fade.show": {
-                    zIndex: 50000,
-                  },
-                  p: {
-                    margin: 0,
-                    padding: 0,
-                  },
-                  // '#custom-modal .in': {
-                  //   position: 'fixed',
-                  //   top: 0,
-                  //   left: 0,
-                  //   right: 0,
-                  //   bottom: 0,
-                  //   zIndex: 10000,
-                  // }
-                }}
-              />
-              <AuthProvider>
-                <LocalizationProvider>
-                  <GlobalDialogProvider>
-                    <GlobalPromptProvider>
-                      <GlobalDrawerProvider>
-                        <MotionLazy>
-                          <SettingsDrawer />
-                          <GlobalDrawer />
-                          <GlobalDialog />
-                          <GlobalPrompt />
-                          <ProgressBar />
-                        </MotionLazy>
-                        {/* <AuthConsumer> */}
-                        <Router />
-                        {/* </AuthConsumer> */}
-                      </GlobalDrawerProvider>
-                    </GlobalPromptProvider>
-                  </GlobalDialogProvider>
-                </LocalizationProvider>
-              </AuthProvider>
-            </ThemeProvider>
-          </AccessibilityProvider>
-        </SettingsProvider>
-      </LocalizationProvider>
+            <AccessibilityProvider
+              defaultSettings={{
+                rootFontSize: 100,
+                colorBlind: false,
+              }}
+            >
+              <ThemeProvider>
+                <GlobalStyles
+                  styles={{
+                    ".stickyTableCell": {
+                      position: "sticky !important",
+                      boxShadow: "5px 2px 5px grey !important",
+                    },
+                    ".react-joyride__tooltip, .react-joyride__tooltip *": {
+                      fontFamily: "Droid Arabic Kufi",
+                    },
+                    "#showModal": {
+                      position: "fixed",
+                    },
+                    "#custom-modal": {
+                      zIndex: 50000,
+                    },
+                    "#custom-modal *": {
+                      zIndex: 50000,
+                    },
+                    "modal-backdrop.fade.show": {
+                      zIndex: 50000,
+                    },
+                    p: {
+                      margin: 0,
+                      padding: 0,
+                    },
+                    // '#custom-modal .in': {
+                    //   position: 'fixed',
+                    //   top: 0,
+                    //   left: 0,
+                    //   right: 0,
+                    //   bottom: 0,
+                    //   zIndex: 10000,
+                    // }
+                  }}
+                />
+                <AuthProvider>
+                  <LocalizationProvider>
+                    <GlobalDialogProvider>
+                      <GlobalPromptProvider>
+                        <GlobalDrawerProvider>
+                          <MotionLazy>
+                            <SettingsDrawer />
+                            <GlobalDrawer />
+                            <GlobalDialog />
+                            <GlobalPrompt />
+                            <ProgressBar />
+                          </MotionLazy>
+                          <AuthConsumer>
+                            <Router />
+                          </AuthConsumer>
+                        </GlobalDrawerProvider>
+                      </GlobalPromptProvider>
+                    </GlobalDialogProvider>
+                  </LocalizationProvider>
+                </AuthProvider>
+              </ThemeProvider>
+            </AccessibilityProvider>
+          </SettingsProvider>
+        </LocalizationProvider>
+      </ReactQueryProvider>
     </>
   );
 }

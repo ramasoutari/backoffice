@@ -3,8 +3,7 @@ import ApplicationsView from "../../../sections/view/applications-view";
 
 // ----------------------------------------------------------------------
 
-export default function MyOrdersPage() {
-
+export default function ApplicationsPage() {
   return (
     <>
       <Helmet>

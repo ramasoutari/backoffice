@@ -83,6 +83,7 @@ const DynamicForm = forwardRef(
     },
     ref
   ) => {
+    console.log("validationSchema", validationSchema);
     const didFillFromLocalStorage = useRef(false);
     const didMount = useRef(false);
     const currentSubmitCount = useRef(0);
@@ -308,6 +309,7 @@ const DynamicForm = forwardRef(
         optionsSourceApiDataKey,
         optionsSourceApiValueKey,
         optionsSourceApiLabelKey,
+        optionsSourceApiParamsStrategy,
         excludedValues,
         isAffectedByOtherFields,
         affectingFields,
@@ -625,6 +627,7 @@ const DynamicForm = forwardRef(
                   optionsSourceApiDataKey,
                   optionsSourceApiValueKey,
                   optionsSourceApiLabelKey,
+                  optionsSourceApiParamsStrategy,
                   excludedValues,
                   required,
                   isAffectedByOtherFields,
@@ -882,75 +885,7 @@ const DynamicForm = forwardRef(
         },
         {}
       );
-
-      const sendData = () => {
-        let isOtpVerificationEnabled = otpVerification?.enabled;
-        if (otpVerification?.enabledWhen?.length > 0) {
-          otpVerification.enabledWhen.forEach((rule, index) => {
-            if (checkRule(rule, completeData[rule.field])) {
-              isOtpVerificationEnabled = true;
-            }
-          });
-        }
-        if (isOtpVerificationEnabled) {
-          // send OTP to field "otpVerification.phoneFieldVariable"
-          if (otpVerification?.submitBeforeOTP) {
-            onSubmit(completeData);
-          }
-          globalDialog.onOpen({
-            title: t("verify_phone_number"),
-            content: (
-              <VerifyOTPDialog
-                phoneNumber={formMethods
-                  .watch(otpVerification.phoneFieldVariable)
-                  .replace(" ", "")
-                  .replace("+", "")}
-                onVerified={() => {
-                  if (otpVerification.onVerified) {
-                    // Here we pass the data to the parent component
-                    otpVerification.onVerified(data);
-                  }
-                  if (!!!otpVerification?.submitBeforeOTP) {
-                    onSubmit(completeData);
-                  }
-                  globalDialog.onClose();
-                }}
-              />
-            ),
-          });
-        } else {
-          onSubmit(completeData);
-          otpVerification?.onVerified(data);
-        }
-      };
-      if (hasFalseInfoAlert) {
-        return globalPrompt.onOpen({
-          type: "warning",
-          content: (
-            <Box
-              sx={{
-                mt: 3,
-              }}
-            >
-              <Typography color="error.main" fontWeight="fontWeightBold">
-                {t("false_info_alert")}
-              </Typography>
-            </Box>
-          ),
-          promptProps: {
-            hideActions: true,
-            icon: "warning",
-            confirmText: t("continue_and_send"),
-            cancelText: t("retreat"),
-            onConfirm: () => {
-              sendData();
-            },
-            onCancel: () => {},
-          },
-        });
-      } else {
-        sendData();
-      }
+      onSubmit(completeData);
     };
 
     useEffect(() => {

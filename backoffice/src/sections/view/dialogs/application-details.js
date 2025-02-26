@@ -7,72 +7,63 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useGlobalDialogContext } from "../../../components/global-dialog";
 import { useLocales } from "../../../locales";
 import DynamicForm, { getForm } from "../../../components/dynamic-form";
 import i18n from "../../../locales/i18n";
 import { Stack } from "@mui/system";
 import { useGlobalPromptContext } from "../../../components/global-prompt";
+import {
+  useGetApplication,
+  useSubmitApplication,
+} from "../../../api/appliactions.api";
+import { LoadingScreen } from "../../../components/loading-screen";
+import { HOST_API } from "../../../config-global";
+import Iconify from "../../../components/iconify";
 
-const ApplicationDetails = ({ ApplicationNumber }) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+const ApplicationDetails = ({ ApplicaitonNumber }) => {
+  console.log("ApplicationNumber", ApplicaitonNumber);
+  const [currentDialog, setCurrentDialog] = useState(-1);
   const [reason, setReason] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
+  const [type, setType] = useState();
+  const [title, setTitle] = useState("");
   const [dialogType, setDialogType] = useState("");
-  const [loading, setLoading] = useState(false);
   const globalDialog = useGlobalDialogContext();
   const globalPrompt = useGlobalPromptContext();
+  const getApplication = useGetApplication();
+  const submitApplication = useSubmitApplication();
+
   const { t } = useLocales();
   const formRef = useRef();
   const direction = i18n.language === "ar" ? "ltr" : "rtl";
+  useEffect(() => {
+    if (ApplicaitonNumber) {
+      getApplication.mutate({
+        id: ApplicaitonNumber,
+      });
+    }
+  }, [ApplicaitonNumber]);
+
+  const applicationInfo = getApplication.data?.application;
+  const stepDataInfo = getApplication.data?.stepData;
+
   const form = getForm([
     {
-      fieldVariable: "environmentalAttachment",
-      label: "environmentalAttachment",
-      placeholder: "environmentalAttachment",
-      type: "input",
-      typeValue: "string",
-      disabled: true,
-      // value: ApplicationNumber.environmentalAttachment,
-      gridOptions: [
-        {
-          breakpoint: "xs",
-          size: 12,
-        },
-        {
-          breakpoint: "md",
-          size: 4,
-        },
-      ],
-    },
-    {
-      fieldVariable: "soilTestAttachment",
-      label: "soilTestAttachment",
-      placeholder: "soilTestAttachment",
-      type: "input",
-      typeValue: "string",
-      disabled: true,
-      // value: ApplicationNumber.soilTestAttachment,
-      gridOptions: [
-        {
-          breakpoint: "xs",
-          size: 12,
-        },
-        {
-          breakpoint: "md",
-          size: 4,
-        },
-      ],
-    },
-    {
-      fieldVariable: "notes",
+      fieldVariable: "extraInfo",
       label: "notes",
       placeholder: "notes",
-      // value: ApplicationNumber.notes,
+      value: "",
       type: "input",
       typeValue: "string",
       disabled: true,
@@ -87,33 +78,21 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
         },
       ],
     },
-    {
-      fieldVariable: "additional_attachments",
-      label: "additional_attachments",
-      placeholder: "additional_attachments",
-      type: "input",
-      typeValue: "string",
-      disabled: true,
-      // value: ApplicationNumber.additional_attachments,
-      gridOptions: [
-        {
-          breakpoint: "xs",
-          size: 12,
-        },
-        {
-          breakpoint: "md",
-          size: 4,
-        },
-      ],
-    },
+
     {
       fieldVariable: "phoneNumber",
-      label: "phoneNumber",
-      placeholder: "phoneNumber",
-      value: "5",
+      label: "phone_number",
+      placeholder: "phone_number",
+      value: "",
       type: "input",
       typeValue: "string",
       disabled: true,
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
+        },
+      ],
       gridOptions: [
         {
           breakpoint: "xs",
@@ -131,9 +110,15 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
       placeholder: "email",
       type: "input",
       typeValue: "string",
-      value: "test test test",
+      value: "",
       disabled: true,
       multiline: true,
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
+        },
+      ],
       rows: 4,
       gridOptions: [
         {
@@ -146,25 +131,77 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
 
   const defaultValues = useMemo(
     () => ({
-      environmentalAttachment: ApplicationNumber?.environmentalAttachment,
-      soilTestAttachment: ApplicationNumber?.soilTestAttachment,
-      notes: ApplicationNumber?.notes,
-      additional_attachments: ApplicationNumber?.additional_attachments,
-      PhoneNumber: ApplicationNumber?.PhoneNumber,
-      email: ApplicationNumber?.email,
+      environmentalAttachment:
+        applicationInfo?.environmantalAttachments?.[0]?.id || "",
+      soilAttachments: applicationInfo?.soilAttachments?.[0]?.id || "",
+      extraInfo: applicationInfo?.extraInfo || "",
+      additional_attachments:
+        applicationInfo?.additional_attachments?.[0]?.id || "",
+      noObjectionAttachment:
+        applicationInfo?.noObjectionAttachment?.[0]?.id || "",
+      phoneNumber: applicationInfo?.phoneNumber || "",
+      email: applicationInfo?.email || "",
     }),
-    [ApplicationNumber]
+    [applicationInfo]
   );
-  const handleOpenDialog = (type) => {
+
+  const handleOpenDialog = (type, index) => {
     setDialogType(type);
-    setDialogOpen(true);
+    setCurrentDialog(index);
   };
 
   const handleCloseDialog = () => {
-    setDialogOpen(false);
+    setCurrentDialog(-1);
     setReason("");
+    setType("");
+    setType("");
   };
-  const handleApprove = () => {
+
+  const handleSubmitReason = useCallback(() => {
+    if (dialogType === "rejected") {
+      submitApplication.mutate(
+        {
+          ApplicaitonNumber,
+          currentDialog,
+          rejection_reason: reason,
+        },
+        {
+          onSuccess: { handleCloseDialog },
+        }
+      );
+    } else if (dialogType === "edit") {
+      submitApplication.mutate(
+        {
+          ApplicaitonNumber,
+          currentDialog,
+          type: type,
+          title: title,
+        },
+        {
+          onSuccess: () => {
+            handleCloseDialog();
+          },
+        }
+      );
+    }
+    handleCloseDialog();
+    globalPrompt.onOpen({
+      type: "success",
+      content: (
+        <Stack direction="column" spacing={1}>
+          <Typography component="h6" variant="h6" fontWeight="fontWeightBold">
+            {t("successfully_submitted")}
+          </Typography>
+        </Stack>
+      ),
+      promptProps: {
+        icon: "success",
+      },
+    });
+  }, [currentDialog, reason, title, type]);
+
+  const handleApprove = (buttonIndex) => {
+    submitApplication.mutate(ApplicaitonNumber, buttonIndex, {});
     globalPrompt.onOpen({
       type: "success",
       content: (
@@ -179,11 +216,8 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
       },
     });
   };
+  if (!applicationInfo) return <LoadingScreen />;
 
-  useEffect(() => {
-    // Simulate async operation (fetching data, etc.)
-    setLoading(false);
-  }, []);
   return (
     <Box sx={direction} py={3}>
       <Stack
@@ -195,17 +229,14 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
           <Typography component="span" sx={{ fontWeight: "bold" }}>
             {t("order_status")} :
           </Typography>{" "}
-          <Typography component="span">
-            {ApplicationNumber?.exteriorReply || "مرفوض"}
-          </Typography>
+          <Typography component="span">{applicationInfo?.status}</Typography>
         </Typography>
-
         <Typography>
           <Typography component="span" sx={{ fontWeight: "bold" }}>
             {t("applicantName")} :
           </Typography>{" "}
           <Typography component="span">
-            {ApplicationNumber?.applicantName || "راما سعيد سليمان السوطري"}
+            {applicationInfo?.applicantName || ""}
           </Typography>
         </Typography>
 
@@ -214,7 +245,7 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
             {t("order_number")} :
           </Typography>{" "}
           <Typography component="span">
-            {ApplicationNumber?.applicationNumber || "2222222"}
+            {applicationInfo?.applicationNumber || ""}
           </Typography>
         </Typography>
       </Stack>
@@ -223,7 +254,7 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
         sx={{
           my: 3,
           justifyContent: "center",
-          alignItems: "center", // Center horizontally
+          alignItems: "center",
           flex: 1,
         }}
       >
@@ -245,59 +276,200 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
           }}
           loading={true}
         />
+        {applicationInfo.environmantalAttachments && (
+          <Box display="flex" flexDirection="column" alignItems="flex-start">
+            <Typography fontWeight="500" p={1}>
+              {t("environmentalAttachment")}:
+            </Typography>
+            <Box display="flex" alignItems="center">
+              {applicationInfo.environmantalAttachments.map(
+                (attachId, index) => (
+                  <Box key={index} display="flex" flexDirection="column" mr={1}>
+                    <Button
+                      onClick={() =>
+                        window.open(
+                          `${HOST_API}/GetAttachment/${attachId.id}`,
+                          "_blank"
+                        )
+                      }
+                      size="small"
+                      sx={{
+                        backgroundColor: "#e6e6e6",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography px={0.5}>{attachId.fileName}</Typography>
+                      <Iconify icon={"mdi:eye"} width={15} />
+                    </Button>
+                  </Box>
+                )
+              )}
+            </Box>
+          </Box>
+        )}
+        {applicationInfo.soilAttachments && (
+          <Box display="flex" flexDirection="column" alignItems="flex-start">
+            <Typography fontWeight="500" p={1}>
+              {t("soilTestAttachment")}:
+            </Typography>
+            <Box display="flex" alignItems="center">
+              {applicationInfo.soilAttachments.map((attachId, index) => (
+                <Box key={index} display="flex" flexDirection="column" mr={1}>
+                  <Button
+                    onClick={() =>
+                      window.open(
+                        `${HOST_API}/GetAttachment/${attachId.id}`,
+                        "_blank"
+                      )
+                    }
+                    size="small"
+                    sx={{
+                      backgroundColor: "#e6e6e6",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography px={0.5}>{attachId.fileName}</Typography>
+                    <Iconify icon={"mdi:eye"} width={15} />
+                  </Button>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        )}
+        {applicationInfo.noObjectionAttachment && (
+          <Box display="flex" flexDirection="column" alignItems="flex-start">
+            <Typography fontWeight="500" p={1}>
+              {t("noObjectionAttachment")}:
+            </Typography>
+            <Box display="flex" alignItems="center">
+              {applicationInfo.noObjectionAttachment.map((attachId, index) => (
+                <Box key={index} display="flex" flexDirection="column" mr={1}>
+                  <Button
+                    onClick={() =>
+                      window.open(
+                        `${HOST_API}/GetAttachment/${attachId.id}`,
+                        "_blank"
+                      )
+                    }
+                    size="small"
+                    sx={{
+                      backgroundColor: "#e6e6e6",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography px={0.5}>{attachId.fileName}</Typography>
+                    <Iconify icon={"mdi:eye"} width={15} />
+                  </Button>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        )}
+        {applicationInfo.additional_attachments && (
+          <Box display="flex" flexDirection="column" alignItems="flex-start">
+            <Typography fontWeight="500" p={1}>
+              {t("additional_attachments")}:
+            </Typography>
+            <Box display="flex" alignItems="center">
+              {applicationInfo.soilAttachments.map((attachId, index) => (
+                <Box key={index} display="flex" flexDirection="column" mr={1}>
+                  <Button
+                    onClick={() =>
+                      window.open(
+                        `${HOST_API}/GetAttachment/${attachId.id}`,
+                        "_blank"
+                      )
+                    }
+                    size="small"
+                    sx={{
+                      backgroundColor: "#e6e6e6",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography px={0.5}>{attachId.fileName}</Typography>
+                    <Iconify icon={"mdi:eye"} width={15} />
+                  </Button>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        )}
         <Stack direction="row" gap={2} my={2} mx={7}>
-          <Button
-            variant="contained"
-            onClick={handleApprove}
-            sx={{
-              backgroundColor: "green",
-              color: "white",
-              width: "327.03px",
-              height: "41.48px",
-              borderRadius: "8px",
-            }}
-          >
-            {t("approve")}
-          </Button>
+          {stepDataInfo?.to.map((item, index) => {
+            if (item === "decline_application") {
+              return (
+                <Button
+                  key={index}
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#FF4242",
+                    color: "white",
+                    width: "327.03px",
+                    height: "41.48px",
+                    borderRadius: "8px",
+                  }}
+                  onClick={() => handleOpenDialog("rejected", index)}
+                >
+                  {t("reject")}
+                </Button>
+              );
+            }
 
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#FF4242",
-              color: "white",
-              width: "327.03px",
-              height: "41.48px",
-              borderRadius: "8px",
-            }}
-            onClick={() => handleOpenDialog("rejected")}
-          >
-            {t("reject")}
-          </Button>
+            if (item === "field_inspection") {
+              return (
+                <Button
+                  key={index}
+                  variant="contained"
+                  onClick={() => handleApprove(index)}
+                  sx={{
+                    backgroundColor: "green",
+                    color: "white",
+                    width: "327.03px",
+                    height: "41.48px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  {t("approve")}
+                </Button>
+              );
+            }
 
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#C06F34",
-              color: "white",
-              width: "327.03px",
-              height: "41.48px",
-              borderRadius: "8px",
-            }}
-            onClick={() => handleOpenDialog("edit")}
-          >
-            {t("need_edit")}
-          </Button>
+            if (item === "extra_Info_backoffice") {
+              return (
+                <Button
+                  key={index}
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#C06F34",
+                    color: "white",
+                    width: "327.03px",
+                    height: "41.48px",
+                    borderRadius: "8px",
+                  }}
+                  onClick={() => handleOpenDialog("edit", index)}
+                >
+                  {t("need_edit")}
+                </Button>
+              );
+            }
+
+            return null;
+          })}
         </Stack>
       </Box>
       <Dialog
-        open={dialogOpen}
+        open={currentDialog > -1}
         onClose={handleCloseDialog}
         sx={{
           "& .MuiDialog-paper": {
             width: "684px",
             height: "400.71px",
             position: "absolute",
-            borderRadius: "8px", // Optional: Adds rounded corners
+            borderRadius: "8px",
           },
         }}
       >
@@ -309,31 +481,82 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
         >
           {dialogType === "rejected" ? t("rejection_reason") : t("edit_needed")}
         </DialogTitle>
-
         <DialogContent>
-          <TextField
-            fullWidth
-            multiline
-            rows={9}
-            label={t("write_here")}
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "black",
-                  borderWidth: "1px",
+          {dialogType === "edit" ? (
+            <>
+              <TextField
+                fullWidth
+                label={t("type_of_info")}
+                select
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                sx={{
+                  mb: 2,
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                      borderWidth: "1px",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              >
+                <MenuItem value="002">{t("text")}</MenuItem>
+                <MenuItem value="001">{t("attachments")}</MenuItem>
+              </TextField>
+              <TextField
+                fullWidth
+                label={t("label")}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                sx={{
+                  mb: 2, // Add margin-bottom
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "black",
+                      borderWidth: "1px",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+            </>
+          ) : (
+            <TextField
+              fullWidth
+              multiline
+              rows={9}
+              label={t("write_here")}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "black",
+                    borderWidth: "1px",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "black",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black",
+                  },
                 },
-                "&:hover fieldset": {
-                  borderColor: "black",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "black",
-                },
-              },
-            }}
-          />
+              }}
+            />
+          )}
         </DialogContent>
+
         <DialogActions
           sx={{
             display: "flex",
@@ -356,6 +579,7 @@ const ApplicationDetails = ({ ApplicationNumber }) => {
           </Button>
           <Button
             variant="contained"
+            onClick={handleSubmitReason}
             sx={{
               backgroundColor: "green",
               color: "white",

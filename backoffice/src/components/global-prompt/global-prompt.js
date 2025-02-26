@@ -1,6 +1,14 @@
 // @mui
 
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+} from "@mui/material";
 // hooks
 import { useGlobalPromptContext } from "./context";
 // components
@@ -43,7 +51,7 @@ export default function GlobalPrompt() {
               }}
             >
               <SvgColor
-                src="/assets/icons/designer/close.svg"
+                src="/icons/close.svg"
                 color="text.secondary"
                 width={24}
               />

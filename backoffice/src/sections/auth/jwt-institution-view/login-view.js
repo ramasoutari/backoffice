@@ -5,15 +5,17 @@ import DynamicForm, { getForm } from "../../../components/dynamic-form";
 import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import { useLocales } from "../../../locales";
 import { color } from "framer-motion";
+import { useLogin } from "../../../api/auth.api";
 
 export default function LoginView() {
-  const { entityLogin } = useAuthContext();
+  const { login } = useAuthContext();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [loginData, setLoginData] = useState("");
   const [timer, setTimer] = useState(0);
   const [resendOTPCounter, setResendOTPCounter] = useState(0);
   const { t } = useLocales();
+  const loginFnc = useLogin();
 
   const OTP_RESEND_INTERVAL_SECONDS = 300;
 
@@ -30,8 +32,6 @@ export default function LoginView() {
     setTimer();
     // setWrongOtp(false)
   };
-
-  let loginFnc = entityLogin;
 
   const loginForm = getForm([
     {
@@ -109,16 +109,19 @@ export default function LoginView() {
   const handleLogin = async (payload) => {
     try {
       setLoading(true);
-      await loginFnc?.(
-        { ...payload },
-        () => {
-          // router.push(PATH_AFTER_LOGIN_CPD);
-          setLoading(false);
+      loginFnc.mutateAsync(
+        {
+          username: payload.username,
+          password: payload.password,
         },
-        () => {
-          setLoginData(payload);
-          startTimer();
-          setLoading(false);
+        {
+          onSuccess: (res) => {
+            setLoading(false);
+            // router.push(PATH_AFTER_LOGIN_CPD);
+            const user = "";
+            console.log("res", res);
+            login();
+          },
         }
       );
     } catch (error) {
@@ -174,7 +177,7 @@ export default function LoginView() {
             onSubmit={handleLogin}
             submitButtonProps={{
               label: t("login"),
-              backgroundColor:"#1D3E6E",
+              backgroundColor: "#1D3E6E",
               alignment: "center",
               width: "100%",
               loading,

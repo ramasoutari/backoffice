@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import { LoadingScreen } from "../../components/loading-screen";
 import { AuthGuard } from "../../auth/guard";
 import DashboardLayout from "../../layouts/dashboard/layout";
+import DepartmentsPage from "../../pages/dashboard/entities/entities";
 
 // ----------------------------------------------------------------------
 
@@ -14,18 +15,21 @@ const UsersPage = lazy(() => import("../../pages/dashboard/users-list/users"));
 const SettingsPage = lazy(() =>
   import("../../pages/dashboard/settings/settings")
 );
+const EntitiesPage = lazy(() =>
+  import("../../pages/dashboard/entities/entities")
+);
 
 export const dashboardRoutes = [
   {
     path: "dashboard",
     element: (
-      // <AuthGuard>
-      <DashboardLayout>
-        <Suspense fallback={<LoadingScreen />}>
-          <Outlet />
-        </Suspense>
-      </DashboardLayout>
-      // </AuthGuard>
+      <AuthGuard>
+        <DashboardLayout>
+          <Suspense fallback={<LoadingScreen />}>
+            <Outlet />
+          </Suspense>
+        </DashboardLayout>
+      </AuthGuard>
     ),
     children: [
       { element: <IndexPage />, index: true },
@@ -40,6 +44,10 @@ export const dashboardRoutes = [
       {
         path: "settings",
         element: <SettingsPage />,
+      },
+      {
+        path: "entities",
+        element: <EntitiesPage />,
       },
     ],
   },

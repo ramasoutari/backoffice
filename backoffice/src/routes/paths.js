@@ -8,6 +8,7 @@ const ROOTS = {
 // ----------------------------------------------------------------------
 
 export const paths = {
+  notAuthorized: `/403`,
   // AUTH
   auth: {
     jwt: {
@@ -23,5 +24,6 @@ export const paths = {
     settings: `${ROOTS.DASHBOARD}/settings`,
     applications: `${ROOTS.DASHBOARD}/applications`,
     users: `${ROOTS.DASHBOARD}/users`,
+    entities: `${ROOTS.DASHBOARD}/entities`,
   },
 };

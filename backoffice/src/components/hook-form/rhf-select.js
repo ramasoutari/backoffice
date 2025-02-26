@@ -1,25 +1,26 @@
-import { useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { useFormContext, Controller } from 'react-hook-form';
-import _ from 'lodash';
+import { useEffect, useRef } from "react";
+import PropTypes from "prop-types";
+import { useFormContext, Controller } from "react-hook-form";
+import _ from "lodash";
 import { useRequest } from "alova";
 // @mui
-import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import MenuItem from '@mui/material/MenuItem';
-import Checkbox from '@mui/material/Checkbox';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import FormHelperText from '@mui/material/FormHelperText';
-import Select from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import MenuItem from "@mui/material/MenuItem";
+import Checkbox from "@mui/material/Checkbox";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import FormHelperText from "@mui/material/FormHelperText";
+import Select from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
 // locales
 // api
 // components
-import { CircularProgress } from '@mui/material';
-import { optionsFromAPISourceGetter } from '../../utils/api';
-import { useLocales } from '../../locales';
+import { CircularProgress } from "@mui/material";
+import { optionsFromAPISourceGetter } from "../../utils/api";
+import { useLocales } from "../../locales";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ export function RHFSelect({
   optionsSourceApiValueKey,
   optionsSourceApiLabelKey,
   optionsSourceApiDataKey,
+  optionsSourceApiParamsStrategy,
   excludedValues = [],
   options: manualOptions,
   placeholder,
@@ -56,32 +58,30 @@ export function RHFSelect({
   const renderCount = useRef(0);
   const { t } = useLocales();
   const {
-    loading,
-    send,
+    isFetching: loading,
+    mutateAsync: send,
     data: options,
-    update,
-  } = useRequest(
-    (params) =>
+  } = useMutation({
+    initialData: manualOptions || [],
+    mutationKey: optionsSourceApi || "",
+    mutationFn: (params) =>
       optionsFromAPISourceGetter(
         optionsSourceApi,
-        // '',
         params,
         optionsSourceApiDataKey,
         optionsSourceApiLabelKey,
         optionsSourceApiValueKey,
+        optionsSourceApiParamsStrategy,
         includeExtraKeys
-        // 'appendUrl'
       ),
-    {
-      immediate: false,
-      initialData: manualOptions || [],
-    }
-  );
+  });
 
   // ** RHF
   const { control, getValues, setValue } = useFormContext();
 
-  const valuesOfAffectingFields = affectingFields?.map((field) => getValues(field.fieldName));
+  const valuesOfAffectingFields = affectingFields?.map((field) =>
+    getValues(field.fieldName)
+  );
 
   // ** Functions
   const handleGetOptionLabel = (option) => {
@@ -108,8 +108,8 @@ export function RHFSelect({
           const { fieldVariable, action } = affectedField;
 
           switch (action) {
-            case 'EMPTY_FIELD':
-              setValue(fieldVariable, '');
+            case "EMPTY_FIELD":
+              setValue(fieldVariable, "");
             default:
               return false;
           }
@@ -120,7 +120,7 @@ export function RHFSelect({
 
   useEffect(() => {
     renderCount.current += 1;
-    if (optionsSourceType === 'api') {
+    if (optionsSourceType === "api") {
       const fetchOptions = async () => {
         let params = {};
         // if affectingFields is not null, then we need to get the value of the affectingFields field
@@ -133,12 +133,10 @@ export function RHFSelect({
           }
 
           affectingFields.forEach((field) => {
-            const { fieldName, urlKey } = field;
+            const { fieldName, paramKey } = field;
             const value = getValues(fieldName);
-            if (!urlKey) {
-              params[fieldName + '_id'] = value;
-            } else {
-              params[urlKey] = value;
+            if (paramKey) {
+              params[paramKey] = value;
             }
           });
         }
@@ -160,31 +158,31 @@ export function RHFSelect({
     // third render is for user interactions
     const renderCountToReset = isInRepeater ? 1 : 2;
     if (isAffectedByOtherFields && renderCount.current > renderCountToReset) {
-      setValue(name, multiple ? [] : '');
-      setValue(name + '_label', '');
-      setValue(name + '_chosen_object', {});
+      setValue(name, multiple ? [] : "");
+      setValue(name + "_label", "");
+      setValue(name + "_chosen_object", {});
       setValue(`${name}_hasOptions`, false);
-      update({
-        data: [],
-      });
+      // update({
+      //   data: [],
+      // });
     }
   }, [
     // whenever the value of affectingFields changes, we need to fetch the options again
     // so we add affectingFields to the dependency array
-    _.join(valuesOfAffectingFields, ','),
+    _.join(valuesOfAffectingFields, ","),
     isInRepeater,
   ]);
 
   useEffect(() => {
-    if (getValues(name) && options.length > 0) {
+    if (getValues(name) && (options || []).length > 0) {
       if (!multiple) {
-        const selectedOption = options.find(
+        const selectedOption = (options || []).find(
           (item) => handleGetOptionValue(item) === getValues(name)
         );
         setValue(`${name}_label`, handleGetOptionLabel(selectedOption));
         setValue(`${name}_chosen_object`, selectedOption);
       } else {
-        setValue(`${name}_label`, t('all'));
+        setValue(`${name}_label`, t("all"));
         setValue(`${name}_chosen_object`, {});
       }
     }
@@ -208,7 +206,7 @@ export function RHFSelect({
             }}
             select
             fullWidth
-            label={t('choose')}
+            label={t("choose")}
             SelectProps={{
               multiple,
               native,
@@ -216,14 +214,18 @@ export function RHFSelect({
                 if (multiple) {
                   let allValuesLabels = value.map((val) => {
                     return handleGetOptionLabel(
-                      options.find((option) => handleGetOptionValue(option) === val)
+                      (options || []).find(
+                        (option) => handleGetOptionValue(option) === val
+                      )
                     );
                   });
-                  return allValuesLabels.join(', ');
+                  return allValuesLabels.join(", ");
                 }
 
                 return handleGetOptionLabel(
-                  options.find((option) => handleGetOptionValue(option) === value)
+                  (options || []).find(
+                    (option) => handleGetOptionValue(option) === value
+                  )
                 );
               },
               MenuProps: {
@@ -238,14 +240,15 @@ export function RHFSelect({
                 PaperProps: {
                   sx: {
                     ...(!native && {
-                      maxHeight: typeof maxHeight === 'number' ? maxHeight : 'unset',
+                      maxHeight:
+                        typeof maxHeight === "number" ? maxHeight : "unset",
                     }),
                     ...PaperPropsSx,
                     zIndex: 9999,
                   },
                 },
               },
-              sx: { textTransform: 'capitalize', ...sx, zIndex: 9999 },
+              sx: { textTransform: "capitalize", ...sx, zIndex: 9999 },
             }}
             MenuProps={{
               PaperProps: {
@@ -271,12 +274,18 @@ export function RHFSelect({
               </MenuItem>
             )}
             {!required && (
-              <MenuItem value="" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
-                {placeholder || t('choose')}
+              <MenuItem
+                value=""
+                sx={{ fontStyle: "italic", color: "text.secondary" }}
+              >
+                {placeholder || t("choose")}
               </MenuItem>
             )}
             {nullable && (
-              <MenuItem value="" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+              <MenuItem
+                value=""
+                sx={{ fontStyle: "italic", color: "text.secondary" }}
+              >
                 None
               </MenuItem>
             )}
@@ -289,8 +298,10 @@ export function RHFSelect({
               />
             )}
             {!loading &&
-              options
-                .filter((item) => !excludedValues.includes(getOptionValue(item)))
+              (options || [])
+                .filter(
+                  (item) => !excludedValues.includes(getOptionValue(item))
+                )
                 .map((option) => {
                   const isSelected = () => {
                     if (multiple) {
@@ -307,9 +318,9 @@ export function RHFSelect({
                       sx={{
                         maxWidth: MenuContainerRef?.current
                           ? MenuContainerRef.current?.node?.clientWidth
-                          : 'fit-content',
-                        whiteSpace: 'normal',
-                        wordWrap: 'break-word',
+                          : "fit-content",
+                        whiteSpace: "normal",
+                        wordWrap: "break-word",
                       }}
                     >
                       {multiple && <Checkbox checked={isSelected()} />}
@@ -331,7 +342,7 @@ RHFSelect.propTypes = {
   helperText: PropTypes.string,
   maxHeight: PropTypes.number,
   name: PropTypes.string,
-  optionsSourceType: PropTypes.oneOf(['manual', 'api']),
+  optionsSourceType: PropTypes.oneOf(["manual", "api"]),
   optionsSourceApi: PropTypes.string,
   optionsSourceApiToken: PropTypes.string,
   optionsSourceApiValueKey: PropTypes.string,
@@ -362,11 +373,13 @@ export function RHFMultiSelect({
   const { control } = useFormContext();
 
   const renderValues = (selectedIds) => {
-    const selectedItems = options.filter((item) => selectedIds.includes(item.value));
+    const selectedItems = (options || []).filter((item) =>
+      selectedIds.includes(item.value)
+    );
 
     if (!selectedItems.length && placeholder) {
       return (
-        <Box component="em" sx={{ color: 'text.disabled' }}>
+        <Box component="em" sx={{ color: "text.disabled" }}>
           {placeholder}
         </Box>
       );
@@ -374,7 +387,7 @@ export function RHFMultiSelect({
 
     if (chip) {
       return (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
           {selectedItems.map((item) => (
             <Chip key={item.value} size="small" label={item.label} />
           ))}
@@ -382,7 +395,7 @@ export function RHFMultiSelect({
       );
     }
 
-    return selectedItems.map((item) => item.label).join(', ');
+    return selectedItems.map((item) => item.label).join(", ");
   };
 
   return (
@@ -421,12 +434,14 @@ export function RHFMultiSelect({
               </MenuItem>
             )}
 
-            {options.map((option) => {
+            {(options || []).map((option) => {
               const selected = field.value.includes(option.value);
 
               return (
                 <MenuItem key={option.value} value={option.value}>
-                  {checkbox && <Checkbox size="small" disableRipple checked={selected} />}
+                  {checkbox && (
+                    <Checkbox size="small" disableRipple checked={selected} />
+                  )}
 
                   {option.label}
                 </MenuItem>
@@ -435,7 +450,9 @@ export function RHFMultiSelect({
           </Select>
 
           {(!!error || helperText) && (
-            <FormHelperText error={!!error}>{error ? error?.message : helperText}</FormHelperText>
+            <FormHelperText error={!!error}>
+              {error ? error?.message : helperText}
+            </FormHelperText>
           )}
         </FormControl>
       )}

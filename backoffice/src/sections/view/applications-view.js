@@ -3,130 +3,61 @@ import { useLocales } from "../../locales";
 import { useSettingsContext } from "../../components/settings/context";
 import i18n from "../../locales/i18n";
 import { useEffect, useState } from "react";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Label from "../../components/label";
 import moment from "moment";
 import Table from "../../components/table copy/table";
-import { GlobalDialog, useGlobalDialogContext } from "../../components/global-dialog";
+import { useGlobalDialogContext } from "../../components/global-dialog";
 import ApplicationDetails from "./dialogs/application-details";
+import { useGetApplications } from "../../api/appliactions.api";
+import { useAuthContext } from "../../auth/hooks";
+import EmptyContent from "../../components/empty-content";
 
 const ApplicationsView = () => {
   const settings = useSettingsContext();
   const { t } = useLocales();
+  const { user } = useAuthContext();
   const direction = i18n.language === "ar" ? "ltr" : "rtl";
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const globalDialog = useGlobalDialogContext();
+  const getApplications = useGetApplications();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [data, setData] = useState({ items: [] });
-  console.log("Data items:", data.items);
-  console.log("Rows:", Array.isArray(data.items) ? data.items : "Not an array");
-  const [applicationCounts, setApplicationCounts] = useState({
-    all: 150,
-    approved: 45,
-    new: 30,
-    rejected: 20,
-    returned: 25,
-  });
+  useEffect(() => {
+    getApplications.mutate({
+      id: user?.departmentId,
+    });
+  }, [user?.departmentId]);
 
   const buttons = [
-    { title: "جميع الطلبات", count: applicationCounts.all, color: "#C06F34" },
-    { title: "الطلبات الجديدة", count: applicationCounts.new, color: "green" },
+    { title: "جميع الطلبات", color: "#D4AF37" },
     {
-      title: "الطلبات الموافق عليها",
-      count: applicationCounts.approved,
-      color: "#FF4242",
+      title: "الطلبات الجديدة",
+      color: "#000000",
+      status: "SUBMITTED",
+    },
+    {
+      title: "الطلبات قيد العمل",
+      color: "#2E8B57",
+      status: "IN_PROGRESS",
+    },
+    {
+      title: "الطلبات اللتي بحاجة لمعلومات الاضافية",
+      color: "#C2B280",
+      status: "EXTRA_INFO",
+    },
+    {
+      title: "الطلبات الكشف الميداني",
+      color: "#005691",
+      status: "INSPECTION",
     },
     {
       title: "الطلبات المرفوضة",
-      count: applicationCounts.rejected,
-      color: "#E5A023",
+      color: "#CC5500",
+      status: "DECLINED",
     },
     {
-      title: "الطلبات المعادة",
-      count: applicationCounts.returned,
-      color: "#1D3E6E",
-    },
-  ];
-  const dummyOrders = [
-    {
-      id: "1",
-      applicationNumber: "APP001",
-      applicantType: "004", // Want Additional Info
-      applicantName: "John Doe",
-      entityRegistrationDate: "2025-01-10",
-      phoneNumber: "1234567890",
-      email: "john.doe@example.com",
-      NationalRegistrationNumber: "123456789",
-      birthDate: null,
-      Gender: null,
-      createdAt: "2025-01-01",
-      updatedAt: "2025-01-10",
-      fieldInspection: "additional info",
-      exteriorReply: "None",
-      extraInfo: "Additional information needed",
-      isDeleted: false,
-      deletedAt: null,
-    },
-    {
-      id: "2",
-      applicationNumber: "APP002",
-      applicantType: "016", // Approved
-      applicantName: "Jane Smith",
-      entityRegistrationDate: "2025-01-12",
-      phoneNumber: "9876543210",
-      email: "jane.smith@example.com",
-      NationalRegistrationNumber: "987654321",
-      birthDate: null,
-      Gender: null,
-      createdAt: "2025-01-05",
-      updatedAt: "2025-01-15",
-      fieldInspection: "Approved",
-      exteriorReply: "None",
-      extraInfo: "Approved for processing",
-      isDeleted: false,
-      deletedAt: null,
-    },
-    {
-      id: "3",
-      applicationNumber: "APP003",
-      applicantType: "009", // In Process
-      applicantName: "Alice Johnson",
-      entityRegistrationDate: "2025-01-18",
-      phoneNumber: "4561237890",
-      email: "alice.johnson@example.com",
-      NationalRegistrationNumber: "456123789",
-      birthDate: null,
-      Gender: null,
-      createdAt: "2025-01-08",
-      updatedAt: "2025-01-18",
-      fieldInspection: "In process",
-      exteriorReply: "Pending",
-      extraInfo: "Currently being processed",
-      isDeleted: false,
-      deletedAt: null,
-    },
-    {
-      id: "4",
-      applicationNumber: "APP004",
-      applicantType: "011", // Rejected
-      applicantName: "Emily White",
-      entityRegistrationDate: "2025-01-20",
-      phoneNumber: "6543219870",
-      email: "emily.white@example.com",
-      NationalRegistrationNumber: "654321987",
-      birthDate: null,
-      Gender: null,
-      createdAt: "2025-01-10",
-      updatedAt: "2025-01-22",
-      fieldInspection: "Rejected",
-      exteriorReply: "Denied",
-      extraInfo: "Rejected due to missing documents",
-      isDeleted: false,
-      deletedAt: null,
+      title: "الطلبات الموافق عليها",
+      color: "#4F4F4F",
+      status: "ACCEPTED",
     },
   ];
 
@@ -166,7 +97,7 @@ const ApplicationsView = () => {
       ),
     },
     {
-      id: "fieldInspection",
+      id: "status",
       label: t("order_status"),
       renderRow: (row, column) => (
         <Label variant="ghost" sx={{}}>
@@ -182,37 +113,18 @@ const ApplicationsView = () => {
     },
   ];
 
-  const onChangeRowsPerPage = (rows) => {
-    setCurrentPage(1);
-    setRowsPerPage(rows);
-    // handleSearch(filters, 1, rows)
+  const onDetailsClick = (application) => {
+    console.log("nnmnnnnnnnnnnnnn", application);
+    globalDialog.onOpen({
+      title: t("application_details"),
+      content: <ApplicationDetails ApplicaitonNumber={application.id} />,
+      dismissable: true,
+      dialogProps: {
+        dismissable: true,
+        maxWidth: "lg",
+      },
+    });
   };
-
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-    // handleSearch(filters, page)
-  };
-  useEffect(() => {
-    if (dummyOrders) {
-      setData({ items: dummyOrders });
-    } else {
-      setData({ items: [] });
-    }
-
-    setLoading(false);
-  }, []);
-    
-     const onDetailsClick = (application) => {
-       globalDialog.onOpen({
-         title: t("application_details"),
-         content: <ApplicationDetails ApplicaitonNumber={application.ApplicaitonNumber} />,
-         dismissable: true,
-         dialogProps: {
-           dismissable: true,
-           maxWidth: "lg",
-         },
-       });
-     };
 
   return (
     <Container
@@ -230,7 +142,7 @@ const ApplicationsView = () => {
             <Button
               key={index}
               sx={{
-                width: "196.83px",
+                width: "140.83px",
                 height: "41.48px",
                 bgcolor: button.color,
                 borderRadius: "8px",
@@ -241,8 +153,14 @@ const ApplicationsView = () => {
                   opacity: 0.9,
                 },
               }}
+              onClick={() => {
+                getApplications.mutateAsync({
+                  id: user?.departmentId,
+                  status: button.status,
+                });
+              }}
             >
-              {button.title} ({button.count})
+              {button.title}
             </Button>
           ))}
         </Stack>
@@ -258,32 +176,19 @@ const ApplicationsView = () => {
           >
             <Box
               sx={{
-                width: "100%", // or use a suitable value if you want to avoid decimal
+                width: "100%",
                 height: "716px",
-                borderRadius: "1px",
+                borderRadius: "8px",
                 border: "1px solid black",
+                overflow: "hidden",
                 position: "center",
               }}
             >
               <Table
-                columns={Array.isArray(columns) ? columns : []} // Ensure columns is an array
+                columns={columns}
                 loading={loading}
-                rows={Array.isArray(data.items) ? data.items : []}
-                pagination={
-                  Array.isArray(data?.items) && data.items.length > 0
-                    ? {
-                        onChangePage: (page) => {
-                          onPageChange(page + 1);
-                        },
-                        onChangeRowsPerPage: (e) => {
-                          onChangeRowsPerPage(e.target.value);
-                        },
-                        rowsPerPage,
-                        page: currentPage - 1,
-                        total: data?.totalRecords || 0,
-                      }
-                    : false
-                }
+                rows={getApplications.data || []}
+                emptyText={<EmptyContent hideImg title={t("no_data")} />}
                 renderActions={(row) => {
                   return (
                     <Box
@@ -304,7 +209,10 @@ const ApplicationsView = () => {
                           fontWeight: "bold",
                           borderColor: "#000000",
                         }}
-                        onClick={() => onDetailsClick(row)} // You can define the handleView function to handle the click
+                        onClick={() => {
+                          console.log("rowww", row);
+                          onDetailsClick(row);
+                        }}
                       >
                         مشــاهدة
                       </Button>
@@ -314,7 +222,6 @@ const ApplicationsView = () => {
               />
             </Box>
           </Box>
-          {/* <Button>hhi</Button> */}
         </Box>
       </Card>
     </Container>

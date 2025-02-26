@@ -196,7 +196,7 @@ const MyOrdersView = () => {
       sx={{ direction }}
       maxWidth={settings.themeStretch ? false : "xl"}
     >
-      <Card>
+      <Card sx={{ padding: 4 }}>
         <Box
           sx={{
             display: "flex",
@@ -354,7 +354,7 @@ const MyOrdersView = () => {
             <Table
               columns={columns}
               loading={loading}
-              rows={data?.items || []} // Provide an empty array if data?.items is undefined
+              rows={data?.items || []}
               pagination={
                 data?.items
                   ? {

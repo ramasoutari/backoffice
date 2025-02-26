@@ -29,7 +29,7 @@ export default function DateTimeOverview() {
         }}
       >
         <Stack direction="row" alignItems="center" gap={1}>
-          <SvgColor src="/assets/icons/designer/clock.svg" width={20} />
+          <SvgColor src="/icons/clock.svg" width={20} />
           <Typography
             variant="caption"
             sx={{ color: "white" }}

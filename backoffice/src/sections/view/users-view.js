@@ -7,11 +7,13 @@ import {
   IconButton,
   InputAdornment,
   TextField,
+  CardHeader,
+  Typography,
 } from "@mui/material";
 import { useLocales } from "../../locales";
 import { useSettingsContext } from "../../components/settings/context";
 import i18n from "../../locales/i18n";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
@@ -20,56 +22,26 @@ import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Table from "../../components/table copy/table";
-import {
-  GlobalDialog,
-  useGlobalDialogContext,
-} from "../../components/global-dialog";
-import ApplicationDetails from "./dialogs/application-details";
+import { useGlobalDialogContext } from "../../components/global-dialog";
 import AddUserDialog from "./dialogs/add-user-dialog";
+import {
+  useDeleteUser,
+  useGetUsers,
+} from "../../api/users.api";
+import { useGlobalPromptContext } from "../../components/global-prompt";
 
 const UsersView = () => {
   const settings = useSettingsContext();
   const { t } = useLocales();
   const direction = i18n.language === "ar" ? "ltr" : "rtl";
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [loading, setLoading] = useState(true);
   const globalDialog = useGlobalDialogContext();
+  const getUsers = useGetUsers();
+  const deleteUser = useDeleteUser();
+  const globalPrompt = useGlobalPromptContext();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [data, setData] = useState({ items: [] });
-
-  const dummyUsers = [
-    {
-      id: "12345",
-      nationalNumber: "987654321",
-      firstName: "John",
-      fatherName: "Michael",
-      grandfatherName: "Robert",
-      familyName: "Doe",
-      username: "johndoe",
-      phoneNumber: "+1234567890",
-      email: "johndoe@example.com",
-      deactivated: false,
-      department: "هيئة الطاقة والمعادن",
-      isDeleted: false,
-      deletedAt: null,
-    },
-    {
-      id: "67890",
-      nationalNumber: "123456789",
-      firstName: "Jane",
-      fatherName: "William",
-      grandfatherName: "Edward",
-      familyName: "Smith",
-      username: "janesmith",
-      phoneNumber: "+9876543210",
-      email: "janesmith@example.com",
-      department: "الدفاع المدني",
-      deactivated: true,
-      isDeleted: false,
-      deletedAt: null,
-    },
-  ];
+  const usersArr = useMemo(() => {
+    return getUsers.data;
+  }, [getUsers.data]);
 
   const columns = [
     {
@@ -124,43 +96,44 @@ const UsersView = () => {
         </Label>
       ),
     },
-
     {
       type: "actions",
       label: t("action"),
       align: "center",
-      minWidth: 80,
     },
   ];
 
-  const onChangeRowsPerPage = (rows) => {
-    setCurrentPage(1);
-    setRowsPerPage(rows);
-    // handleSearch(filters, 1, rows)
-  };
-
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-    // handleSearch(filters, page)
-  };
-  useEffect(() => {
-    if (dummyUsers) {
-      setData({ items: dummyUsers });
-    } else {
-      setData({ items: [] });
-    }
-
-    setLoading(false);
-  }, []);
-
-  const onDetailsClick = () => {
+  const onDetailsClick = (user) => {
     globalDialog.onOpen({
-      title: t("register_user"),
-      content: <AddUserDialog />,
-      dismissable: true,
+      title: t("view_user"),
+      content: <AddUserDialog user={user} viewOnly={true} />,
       dialogProps: {
         dismissable: true,
         maxWidth: "lg",
+        sx: { backgroudColor: "red" },
+      },
+    });
+  };
+
+  const handleEdit = (user) => {
+    globalDialog.onOpen({
+      title: t("update_user"),
+      content: <AddUserDialog user={user} />,
+      dialogProps: {
+        dismissable: true,
+        maxWidth: "lg",
+        sx: { backgroudColor: "red" },
+      },
+    });
+  };
+  const onRegisterClick = () => {
+    globalDialog.onOpen({
+      title: t("register_user"),
+      content: <AddUserDialog />,
+      dialogProps: {
+        dismissable: true,
+        maxWidth: "lg",
+        sx: { backgroudColor: "red" },
       },
     });
   };
@@ -170,13 +143,13 @@ const UsersView = () => {
       sx={{ direction }}
       maxWidth={settings.themeStretch ? false : "xl"}
     >
-      <Card sx={{ padding: 2 }}>
-        <Stack direction="row" alignItems="center" sx={{ p: 4, width: "100%" }}>
+      <Card>
+        <Stack direction="row" alignItems="center" sx={{ p: 2 }}>
           <Button
             variant="outlined"
-            onClick={() => onDetailsClick()}
+            onClick={() => onRegisterClick()}
             sx={{
-              width: "419.32px",
+              width: "288.32px",
               height: "41.48px",
               borderRadius: "8px",
               borderWidth: "2px",
@@ -233,17 +206,16 @@ const UsersView = () => {
           >
             <Box
               sx={{
-                width: "100%",
-                height: "716px",
-                borderRadius: "4px",
+                borderRadius: "8px",
                 border: "1px solid black",
+                overflow: "hidden",
                 position: "center",
               }}
             >
               <Table
-                columns={Array.isArray(columns) ? columns : []} // Ensure columns is an array
-                loading={loading}
-                rows={Array.isArray(data.items) ? data.items : []}
+                columns={columns}
+                loading={getUsers.isFetching}
+                rows={usersArr || []}
                 renderActions={(row) => {
                   return (
                     <Box
@@ -258,18 +230,35 @@ const UsersView = () => {
                       <IconButton color={row.deactivated ? "error" : "success"}>
                         <RadioButtonCheckedIcon />
                       </IconButton>
-                      <IconButton color="primary">
+                      <IconButton
+                        color="primary"
+                        onClick={() => onDetailsClick(row)}
+                      >
                         <VisibilityIcon />
                       </IconButton>
                       <IconButton
                         color="warning"
-                        onClick={() => console.log("Edit", row)}
+                        onClick={() => handleEdit(row)}
                       >
                         <BorderColorIcon />
                       </IconButton>
                       <IconButton
                         color="error"
-                        onClick={() => console.log("Delete", row)}
+                        onClick={() => {
+                          globalPrompt.onOpen({
+                            type: "warning",
+                            content: t("delete_user"),
+                            promptProps: {
+                              hideActions: true,
+                              icon: "warning",
+                              onConfirm: async () => {
+                                await deleteUser.mutateAsync({ id: row.id });
+                                globalPrompt.onClose();
+                              },
+                              onCancel: () => {},
+                            },
+                          });
+                        }}
                       >
                         <DeleteIcon />
                       </IconButton>

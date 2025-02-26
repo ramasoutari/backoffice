@@ -3,12 +3,11 @@ import DahboardView from "../../../sections/view/dashboard-view";
 
 // ----------------------------------------------------------------------
 
-export default function MyOrdersPage() {
-
+export default function DashboardPage() {
   return (
     <>
       <Helmet>
-        <title>Dashboard: My Applications</title>
+        <title>Dashboard</title>
       </Helmet>
 
       <DahboardView />

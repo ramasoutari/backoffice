@@ -19,24 +19,36 @@ import { Stack } from "@mui/system";
 import { useGlobalPromptContext } from "../../../components/global-prompt";
 import { color } from "framer-motion";
 import { options } from "numeral";
+import axiosInstance from "../../../utils/axios";
+import { HOST_API } from "../../../config-global";
+import {
+  useGetDepartmentRoles,
+  useGetDepartments,
+} from "../../../api/departments.api";
+import { useRegisterUser, useUpdateUser } from "../../../api/users.api";
+import toast from "react-hot-toast";
 
-const AddUserDialog = () => {
+const AddUserDialog = ({ user, viewOnly = false }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reason, setReason] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
   const [dialogType, setDialogType] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [departmentRoles, setDepartmentRoles] = useState(false);
   const globalDialog = useGlobalDialogContext();
   const globalPrompt = useGlobalPromptContext();
   const { t } = useLocales();
-  const formRef = useRef();
+  const registerUser = useRegisterUser();
+  const updateUser = useUpdateUser();
+
+  const [isLoading, startLoading] = useState(false);
   const direction = i18n.language === "ar" ? "ltr" : "rtl";
+
   const form = getForm([
     {
       fieldVariable: "nationalNumber",
       label: "national_id",
       placeholder: "national_id",
       value: "",
+      disabled: viewOnly,
       type: "input",
       typeValue: "string",
       gridOptions: [
@@ -47,6 +59,12 @@ const AddUserDialog = () => {
         {
           breakpoint: "md",
           size: 4,
+        },
+      ],
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
         },
       ],
     },
@@ -55,6 +73,7 @@ const AddUserDialog = () => {
       label: "firstName",
       placeholder: "firstName",
       type: "input",
+      disabled: viewOnly,
       typeValue: "string",
       value: "",
       gridOptions: [
@@ -65,6 +84,12 @@ const AddUserDialog = () => {
         {
           breakpoint: "md",
           size: 4,
+        },
+      ],
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
         },
       ],
     },
@@ -73,6 +98,7 @@ const AddUserDialog = () => {
       label: "fatherName",
       placeholder: "fatherName",
       type: "input",
+      disabled: viewOnly,
       typeValue: "string",
       value: "",
       gridOptions: [
@@ -83,6 +109,12 @@ const AddUserDialog = () => {
         {
           breakpoint: "md",
           size: 4,
+        },
+      ],
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
         },
       ],
     },
@@ -91,6 +123,7 @@ const AddUserDialog = () => {
       label: "grandfatherName",
       placeholder: "grandfatherName",
       value: "",
+      disabled: viewOnly,
       type: "input",
       typeValue: "string",
       gridOptions: [
@@ -101,6 +134,12 @@ const AddUserDialog = () => {
         {
           breakpoint: "md",
           size: 4,
+        },
+      ],
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
         },
       ],
     },
@@ -109,6 +148,7 @@ const AddUserDialog = () => {
       label: "last_name",
       placeholder: "last_name",
       type: "input",
+      disabled: viewOnly,
       typeValue: "string",
       value: "",
       gridOptions: [
@@ -119,6 +159,12 @@ const AddUserDialog = () => {
         {
           breakpoint: "md",
           size: 4,
+        },
+      ],
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
         },
       ],
     },
@@ -127,6 +173,7 @@ const AddUserDialog = () => {
       label: "phone_number",
       placeholder: "phone_number",
       value: "",
+      disabled: viewOnly,
       type: "input",
       typeValue: "string",
       gridOptions: [
@@ -139,12 +186,19 @@ const AddUserDialog = () => {
           size: 4,
         },
       ],
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
+        },
+      ],
     },
     {
       fieldVariable: "email",
       label: "email",
       placeholder: "email",
       type: "input",
+      disabled: viewOnly,
       typeValue: "string",
       value: "",
       multiline: true,
@@ -155,28 +209,70 @@ const AddUserDialog = () => {
           size: 4,
         },
       ],
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
+        },
+      ],
     },
     {
       fieldVariable: "departmentId",
       label: "department",
       placeholder: "department",
       type: "select",
+      disabled: viewOnly,
       typeValue: "string",
       value: "",
-      options: [
+      optionsSourceType: "api",
+      optionsSourceApi: "/departments",
+      optionsSourceApiDataKey: "departments",
+      optionsSourceApiLabelKey: "nameAr",
+      optionsSourceApiValueKey: "id",
+      gridOptions: [
         {
-          label: "الدفاع المدني",
-          value: "002",
+          breakpoint: "xs",
+          size: 12,
         },
         {
-          label: "هيئة الطاقة والمعادن",
-          value: "001",
+          breakpoint: "md",
+          size: 4,
         },
         {
-          label: "مديرية الوقاية والحماية ",
-          value: "001",
+          breakpoint: "lg",
+          size: 4,
         },
       ],
+      validations: [
+        {
+          type: "required",
+          message: t("required"),
+        },
+      ],
+    },
+    {
+      fieldVariable: "roleIds",
+      label: "role",
+      placeholder: "role",
+      type: "select",
+      disabled: viewOnly,
+      typeValue: "array",
+      value: [],
+      isAffectedByOtherFields: true,
+      row: true,
+      affectingFields: [
+        {
+          fieldName: "departmentId",
+          paramKey: "depId",
+        },
+      ],
+      multiple: true,
+      optionsSourceType: "api",
+      optionsSourceApi: "/department/{{depId}}/roles",
+      optionsSourceApiDataKey: "roles",
+      optionsSourceApiLabelKey: "role",
+      optionsSourceApiValueKey: "id",
+      optionsSourceApiParamsStrategy: "params",
       gridOptions: [
         {
           breakpoint: "xs",
@@ -199,6 +295,59 @@ const AddUserDialog = () => {
       ],
     },
   ]);
+
+  const defaultValues = useMemo(() => {
+    return {
+      nationalNumber: user?.nationalNumber || "",
+      firstName: user?.firstName || "",
+      fatherName: user?.fatherName || "",
+      grandfatherName: user?.grandfatherName || "",
+      familyName: user?.familyName || "",
+      phoneNumber: user?.phoneNumber || "",
+      email: user?.email || "",
+      departmentId: user?.departmentId || "",
+      roleIds: user?.roleIds || [],
+    };
+  }, [user]);
+
+  const onSubmit = (data) => {
+    if (isLoading) return;
+    if (!user) {
+      startLoading(async () => {
+        await registerUser.mutateAsync({
+          nationalNumber: data.nationalNumber,
+          firstName: data.firstName,
+          fatherName: data.fatherName,
+          grandfatherName: data.grandfatherName,
+          familyName: data.familyName,
+          phoneNumber: data.phoneNumber,
+          email: data.email,
+          departmentId: data?.departmentId,
+          roleIds: data.roleIds,
+        });
+        globalDialog.onClose();
+        toast.success(t("successfully_saved"));
+      });
+    } else {
+      startLoading(async () => {
+        await updateUser.mutateAsync({
+          id: user.id,
+          data: {
+            firstName: data.firstName,
+            fatherName: data.fatherName,
+            grandfatherName: data.grandfatherName,
+            familyName: data.familyName,
+            phoneNumber: data.phoneNumber,
+            email: data.email,
+            departmentId: data?.departmentId,
+            roleIds: data.roleIds,
+          },
+        });
+        globalDialog.onClose();
+        toast.success(t("successfully_saved"));
+      });
+    }
+  };
 
   const handleOpenDialog = (type) => {
     setDialogType(type);
@@ -225,19 +374,15 @@ const AddUserDialog = () => {
     });
   };
 
-  useEffect(() => {
-    // Simulate async operation (fetching data, etc.)
-    setLoading(false);
-  }, []);
   return (
     <Box sx={direction} py={3}>
       <Box sx={{ direction }}>
         <DynamicForm
           {...form}
-          ref={formRef}
+          defaultValues={defaultValues}
           onFormValuesChange={(values) => {}}
           validationMode="onChange"
-          onSubmit={(values) => globalDialog.onClose()}
+          onSubmit={onSubmit}
           extraButtons={
             <Button
               variant="contained"
@@ -313,39 +458,63 @@ const AddUserDialog = () => {
             }}
           />
         </DialogContent>
-        <DialogActions
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "16px",
-            paddingBottom: "20px",
-          }}
-        >
-          <Button
+        {viewOnly ? (
+          <DialogActions
             sx={{
-              color: "white",
-              backgroundColor: "#B0B0B0",
-              width: "187.03px",
-              height: "41.48px",
-              borderRadius: "8px",
-            }}
-            onClick={handleCloseDialog}
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "green",
-              color: "white",
-              width: "187.03px",
-              height: "41.48px",
-              borderRadius: "8px",
+              display: "flex",
+              justifyContent: "center",
+              gap: "16px",
+              paddingBottom: "20px",
             }}
           >
-            {t("send")}
-          </Button>
-        </DialogActions>
+            <Button
+              sx={{
+                color: "white",
+                backgroundColor: "#B0B0B0",
+                width: "100%",
+                height: "41.48px",
+                borderRadius: "8px",
+              }}
+              onClick={handleCloseDialog}
+            >
+              {t("cancel")}
+            </Button>
+          </DialogActions>
+        ) : (
+          <DialogActions
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "16px",
+              paddingBottom: "20px",
+            }}
+          >
+            <Button
+              sx={{
+                color: "white",
+                backgroundColor: "#B0B0B0",
+                width: "187.03px",
+                height: "41.48px",
+                borderRadius: "8px",
+              }}
+              onClick={handleCloseDialog}
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "green",
+                color: "white",
+                width: "187.03px",
+                height: "41.48px",
+                borderRadius: "8px",
+              }}
+            >
+              {t("send")}
+            </Button>
+          </DialogActions>
+        )}
       </Dialog>
     </Box>
   );
