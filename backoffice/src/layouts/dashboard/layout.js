@@ -35,28 +35,24 @@ export default function DashboardLayout({ children }) {
     <NavVertical openNav={nav.value} onCloseNav={nav.onFalse} />
   );
 
+  return (
+    <>
+      <Box sx={{ direction }}>
+        <Header onOpenNav={nav.onTrue} />
+        <Box
+          sx={{
+            display: "flex",
+            direction,
+            // flexDirection: { xs: "column", md: "row" },
+          }}
+        >
+          {renderNavVertical}
 
-
-
-
- return (
-   <>
-     <Box sx={{ direction }}>
-       <Header onOpenNav={nav.onTrue} />
-       <Box
-         sx={{
-           display: "flex",
-           direction,
-           // flexDirection: { xs: "column", md: "row" },
-         }}
-       >
-         {renderNavVertical}
-
-         <Main>{children}</Main>
-       </Box>
-     </Box>
-   </>
- );
+          <Main>{children}</Main>
+        </Box>
+      </Box>
+    </>
+  );
 }
 
 DashboardLayout.propTypes = {

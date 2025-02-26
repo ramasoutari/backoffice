@@ -1,22 +1,18 @@
-import PropTypes from 'prop-types';
-import { useState, useEffect, useCallback } from 'react';
+import PropTypes from "prop-types";
+import { useState, useEffect, useCallback } from "react";
 // @mui
-import Collapse from '@mui/material/Collapse';
+import Collapse from "@mui/material/Collapse";
 // routes
 //
-import NavItem from './nav-item';
-import { usePathname } from '../../../routes/hooks';
+import NavItem from "./nav-item";
+import { usePathname } from "../../../routes/hooks";
 
 // ----------------------------------------------------------------------
 
 export default function NavList({ data, depth, hasChild, config }) {
   const pathname = usePathname();
 
-
-
   const [open, setOpen] = useState();
-
-
 
   const handleToggle = useCallback(() => {
     setOpen((prev) => !prev);
