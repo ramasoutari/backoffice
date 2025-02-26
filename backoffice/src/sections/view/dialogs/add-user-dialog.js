@@ -40,7 +40,7 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
   const updateUser = useUpdateUser();
 
   const [isLoading, startLoading] = useState(false);
-  const direction = i18n.language === "ar" ? "ltr" : "rtl";
+  const direction = i18n.language === "ar" ? "rtl" : "ltr";
 
   const form = getForm([
     {

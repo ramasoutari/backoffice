@@ -1,20 +1,20 @@
-import PropTypes from 'prop-types';
-import { useEffect, useRef, useState } from 'react';
-import { useFormContext, Controller } from 'react-hook-form';
-import _ from 'lodash';
+import PropTypes from "prop-types";
+import { useEffect, useRef, useState } from "react";
+import { useFormContext, Controller } from "react-hook-form";
+import _ from "lodash";
 import { useRequest } from "alova";
 // @mui
-import Radio from '@mui/material/Radio';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import RadioGroup from '@mui/material/RadioGroup';
+import Radio from "@mui/material/Radio";
+import FormLabel from "@mui/material/FormLabel";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import RadioGroup from "@mui/material/RadioGroup";
 // locales
 // api
 // components
-import { CircularProgress } from '@mui/material';
-import { optionsFromAPISourceGetter } from '../../utils/api';
+import { CircularProgress } from "@mui/material";
+import { optionsFromAPISourceGetter } from "../../utils/api";
 
 // ----------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ export default function RHFRadioGroup({
         params,
         optionsSourceApiDataKey,
         optionsSourceApiLabelKey,
-        optionsSourceApiValueKey,
+        optionsSourceApiValueKey
         // 'appendUrl'
       ),
     {
@@ -64,9 +64,11 @@ export default function RHFRadioGroup({
 
   const { control, getValues, setValue } = useFormContext();
 
-  const labelledby = label ? `${name}-${label}` : '';
+  const labelledby = label ? `${name}-${label}` : "";
 
-  const valuesOfAffectingFields = affectingFields?.map((field) => getValues(field.fieldName));
+  const valuesOfAffectingFields = affectingFields?.map((field) =>
+    getValues(field.fieldName)
+  );
 
   // ** Functions
   const handleGetOptionLabel = (option) => {
@@ -85,7 +87,7 @@ export default function RHFRadioGroup({
 
   useEffect(() => {
     renderCount.current += 1;
-    if (optionsSourceType === 'api') {
+    if (optionsSourceType === "api") {
       const fetchOptions = async () => {
         let params = {};
         // if affectingFields is not null, then we need to get the value of the affectingFields field
@@ -101,7 +103,7 @@ export default function RHFRadioGroup({
             const { fieldName, urlKey } = field;
             const value = getValues(fieldName);
             if (!urlKey) {
-              params[fieldName + '_id'] = value;
+              params[fieldName + "_id"] = value;
             } else {
               params[urlKey] = value;
             }
@@ -124,8 +126,8 @@ export default function RHFRadioGroup({
     // only after second render, because first and second render are use to setup fields
     // third render is for user interactions
     if (isAffectedByOtherFields && renderCount.current > 2) {
-      setValue(name, '');
-      setValue(name + '_label', '');
+      setValue(name, "");
+      setValue(name + "_label", "");
       setValue(`${name}_hasOptions`, false);
       update({
         data: [],
@@ -134,12 +136,14 @@ export default function RHFRadioGroup({
   }, [
     // whenever the value of affectingFields changes, we need to fetch the options again
     // so we add affectingFields to the dependency array
-    _.join(valuesOfAffectingFields, ','),
+    _.join(valuesOfAffectingFields, ","),
   ]);
 
   useEffect(() => {
     if (getValues(name) && options.length > 0) {
-      const selectedOption = options.find((item) => handleGetOptionValue(item) === getValues(name));
+      const selectedOption = options.find(
+        (item) => handleGetOptionValue(item) === getValues(name)
+      );
       setValue(`${name}_label`, handleGetOptionLabel(selectedOption));
     }
   }, [getValues(name), options]);
@@ -151,7 +155,11 @@ export default function RHFRadioGroup({
       render={({ field, fieldState: { error } }) => (
         <FormControl component="fieldset">
           {label && (
-            <FormLabel component="legend" id={labelledby} sx={{ typography: 'body2' }}>
+            <FormLabel
+              component="legend"
+              id={labelledby}
+              sx={{ typography: "body2" }}
+            >
               {label}
             </FormLabel>
           )}
@@ -165,7 +173,7 @@ export default function RHFRadioGroup({
               const selectedOption = options.find((item) => {
                 const value = handleGetOptionValue(item);
                 return String(value) === String(selectedValue);
-              })
+              });
               // set the value of the current field
               field.onChange(handleGetOptionValue(selectedOption));
             }}
@@ -176,7 +184,9 @@ export default function RHFRadioGroup({
             {loading && <CircularProgress size={24} />}
             {!loading &&
               options
-                .filter((item) => !excludedValues.includes(getOptionValue(item)))
+                .filter(
+                  (item) => !excludedValues.includes(getOptionValue(item))
+                )
                 .map((option, index) => {
                   return (
                     <FormControlLabel
@@ -186,12 +196,12 @@ export default function RHFRadioGroup({
                       label={handleGetOptionLabel(option)}
                       disabled={loading || other?.disabled}
                       sx={{
-                        '&:not(:last-of-type)': {
+                        "&:not(:last-of-type)": {
                           mb: spacing || 0,
                         },
                         ...(row && {
                           mr: 0,
-                          '&:not(:last-of-type)': {
+                          "&:not(:last-of-type)": {
                             mr: spacing || 2,
                           },
                         }),
@@ -202,7 +212,7 @@ export default function RHFRadioGroup({
           </RadioGroup>
 
           {(!!error || helperText) && (
-            <FormHelperText error={!!error} sx={{ mx: 0 }}>
+            <FormHelperText error={!!error} sx={{ mx: 0, textAlign: "right" }}>
               {error ? error?.message : helperText}
             </FormHelperText>
           )}
@@ -216,7 +226,7 @@ RHFRadioGroup.propTypes = {
   helperText: PropTypes.string,
   label: PropTypes.string,
   name: PropTypes.string,
-  optionsSourceType: PropTypes.oneOf(['manual', 'api']),
+  optionsSourceType: PropTypes.oneOf(["manual", "api"]),
   optionsSourceApi: PropTypes.string,
   optionsSourceApiToken: PropTypes.string,
   optionsSourceApiDataKey: PropTypes.string,

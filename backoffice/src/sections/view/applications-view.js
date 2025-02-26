@@ -16,7 +16,7 @@ const ApplicationsView = () => {
   const settings = useSettingsContext();
   const { t } = useLocales();
   const { user } = useAuthContext();
-  const direction = i18n.language === "ar" ? "ltr" : "rtl";
+  const direction = i18n.language === "ar" ? "rtl" : "ltr";
   const [loading, setLoading] = useState(false);
   const globalDialog = useGlobalDialogContext();
   const getApplications = useGetApplications();

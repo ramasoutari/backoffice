@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }) {
   const settings = useSettingsContext();
 
   const lgUp = useResponsive("up", "lg");
-  const direction = i18n.language === "ar" ? "ltr" : "rtl";
+  const direction = i18n.language === "ar" ? "rtl" : "ltr";
 
   const nav = useBoolean();
 

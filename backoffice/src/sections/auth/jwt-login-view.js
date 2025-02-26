@@ -38,7 +38,7 @@ import i18n from "../../locales/i18n";
 export default function JwtLoginView() {
   const { t } = useLocales();
 
-  const direction = i18n.language === "ar" ? "ltr" : "trl";
+  const direction = i18n.language === "ar" ? "rtl" : "ltr";
   useEffect(() => {
     console.log("direction", direction);
   }, [direction]);

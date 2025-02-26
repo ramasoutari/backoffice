@@ -14,7 +14,7 @@ import NavVertical from "../dashboard/nav-vertical";
 // ----------------------------------------------------------------------
 
 export default function CompactLayout({ children }) {
-  const direction = i18n.language === "ar" ? "ltr" : "rtl";
+  const direction = i18n.language === "ar" ? "rtl" : "ltr";
   const nav = useBoolean();
 
   const renderNavVertical = (

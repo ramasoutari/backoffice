@@ -11,10 +11,10 @@ export default function InputLabel({ htmlFor, variant, label, sx, ...other }) {
       fontWeight="fontWeightBold"
       sx={{
         mb: 1,
-        borderLeftWidth: 4,
-        borderLeftStyle: "solid",
-        borderLeftColor: "#1D3E6E",
-        paddingLeft: 0.5,
+        borderRightWidth: 4,
+        borderRightStyle: "solid",
+        borderRightColor: "#1D3E6E",
+        paddingRight: 0.5,
         ...sx,
       }}
       {...other}

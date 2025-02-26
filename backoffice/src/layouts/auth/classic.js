@@ -53,28 +53,6 @@ export default function AuthClassicLayout({ children }) {
         minHeight: "100vh",
       }}
     >
-      {/* Left Side - Image Section */}
-      <Box
-        sx={{
-          flex: 1,
-          position: "relative",
-          minHeight: "100vh",
-          backgroundColor: "common.white",
-        }}
-      >
-        {/* Background Image */}
-        <Box
-          sx={{
-            position: "absolute",
-            width: "343px",
-            height: "344px",
-            top: "250px",
-            left: "300px",
-            backgroundImage: `url(/icons/login-image.png)`,
-            backgroundPosition: "center",
-          }}
-        />
-      </Box>
       {/* Right Side - Login Form */}
       <Box
         sx={{
@@ -85,10 +63,10 @@ export default function AuthClassicLayout({ children }) {
           width: "850",
           height: "1024",
           backgroundColor: "common.white",
-          borderTopRightRadius: "37px",
-          borderBottomRightRadius: "37px",
+          borderTopLeftRadius: "37px",
+          borderBottomLeftRadius: "37px",
           zIndex: 55,
-          mr: "-40px",
+          ml: "-40px",
           boxShadow: "-1px 10px 60px rgba(5, 5, 5, 0.1)",
         }}
       >
@@ -114,6 +92,29 @@ export default function AuthClassicLayout({ children }) {
             </Box>
           </Box>
         </Container>
+      </Box>
+      
+      {/* Left Side - Image Section */}
+      <Box
+        sx={{
+          flex: 1,
+          position: "relative",
+          minHeight: "100vh",
+          backgroundColor: "common.white",
+        }}
+      >
+        {/* Background Image */}
+        <Box
+          sx={{
+            position: "absolute",
+            width: "343px",
+            height: "344px",
+            top: "250px",
+            left: "300px",
+            backgroundImage: `url(/icons/login-image.png)`,
+            backgroundPosition: "center",
+          }}
+        />
       </Box>
     </Box>
   );

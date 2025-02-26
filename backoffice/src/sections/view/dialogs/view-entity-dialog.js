@@ -10,7 +10,7 @@ const ViewEntityDialog = ({ entity, viewOnly = true }) => {
   const { t } = useLocales();
 
   const [isLoading, startLoading] = useState(false);
-  const direction = i18n.language === "ar" ? "ltr" : "rtl";
+  const direction = i18n.language === "ar" ? "rtl" : "ltr";
   console.log("entity", entity);
   const form = getForm([
     {

@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/iframe-has-title */
-import PropTypes from 'prop-types';
-import { useFormContext, Controller, useController } from 'react-hook-form';
+import PropTypes from "prop-types";
+import { useFormContext, Controller, useController } from "react-hook-form";
 // @mui
-import FormHelperText from '@mui/material/FormHelperText';
+import FormHelperText from "@mui/material/FormHelperText";
 // utils
 //
-import { UploadAvatar, Upload, UploadBox, UploadField } from '../upload';
-import { useEffect, useState } from 'react';
+import { UploadAvatar, Upload, UploadBox, UploadField } from "../upload";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -16,16 +16,16 @@ import {
   IconButton,
   Stack,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 import uuidv4 from "../../utils/uuidv4";
-import _ from 'lodash';
-import SvgColor from '../svg-color';
-import imageCompression from 'browser-image-compression';
-import { PDFDocument } from 'pdf-lib';
-import { useResponsive } from '../../hooks/use-responsive';
-import { useGlobalDialogContext } from '../global-dialog';
-import axiosInstance from '../../utils/axios';
-import { useLocales } from '../../locales';
+import _ from "lodash";
+import SvgColor from "../svg-color";
+import imageCompression from "browser-image-compression";
+import { PDFDocument } from "pdf-lib";
+import { useResponsive } from "../../hooks/use-responsive";
+import { useGlobalDialogContext } from "../global-dialog";
+import axiosInstance from "../../utils/axios";
+import { useLocales } from "../../locales";
 
 // ----------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ export function RHFUploadAvatar({ name, ...other }) {
           <UploadAvatar error={!!error} file={field.value} {...other} />
 
           {!!error && (
-            <FormHelperText error sx={{ px: 2, textAlign: 'center' }}>
+            <FormHelperText error sx={{ px: 2, textAlign: "center" }}>
               {error.message}
             </FormHelperText>
           )}
@@ -95,12 +95,15 @@ export function RHFUpload({ name, multiple, helperText, ...other }) {
         multiple ? (
           <Upload
             multiple
-            accept={{ 'image/*': [] }}
+            accept={{ "image/*": [] }}
             files={field.value}
             error={!!error}
             helperText={
               (!!error || helperText) && (
-                <FormHelperText error={!!error} sx={{ px: 2 }}>
+                <FormHelperText
+                  error={!!error}
+                  sx={{ px: 2, textAlign: "right" }}
+                >
                   {error ? error?.message : helperText}
                 </FormHelperText>
               )
@@ -109,12 +112,15 @@ export function RHFUpload({ name, multiple, helperText, ...other }) {
           />
         ) : (
           <Upload
-            accept={{ 'image/*': [] }}
+            accept={{ "image/*": [] }}
             file={field.value}
             error={!!error}
             helperText={
               (!!error || helperText) && (
-                <FormHelperText error={!!error} sx={{ px: 2 }}>
+                <FormHelperText
+                  error={!!error}
+                  sx={{ px: 2, textAlign: "right" }}
+                >
                   {error ? error?.message : helperText}
                 </FormHelperText>
               )
@@ -146,7 +152,8 @@ export function RHFUploadField({
   ...other
 }) {
   const allowedExtensionsList = allowedExtensions.slice();
-  const { control, getValues, setValue, setError, clearErrors } = useFormContext();
+  const { control, getValues, setValue, setError, clearErrors } =
+    useFormContext();
   const [eFileId, setEFileId] = useState(null);
   const [currentFiles, setCurrentFiles] = useState([]);
   const [viewFile, setViewFile] = useState(null);
@@ -174,7 +181,7 @@ export function RHFUploadField({
   };
 
   const parseExtension = (fileName) => {
-    return fileName?.split('.')?.pop();
+    return fileName?.split(".")?.pop();
     // if (extension.includes("/")) {
     //   return extension.split("/")[1]
     // } else {
@@ -188,17 +195,17 @@ export function RHFUploadField({
       const compressedPdfBytes = await pdfDoc.save();
       const compressedBlob = new Blob([compressedPdfBytes]);
       const fileName = file.name;
-      const lastDotIndex = fileName.lastIndexOf('.');
-      const baseName = fileName.substring(0, lastDotIndex).replace(/\./g, '');
+      const lastDotIndex = fileName.lastIndexOf(".");
+      const baseName = fileName.substring(0, lastDotIndex).replace(/\./g, "");
       const extension = fileName.substring(lastDotIndex);
       const cleanedFileName = baseName + extension;
       const compressedFile = new File([compressedBlob], cleanedFileName, {
-        type: 'application/pdf',
+        type: "application/pdf",
         lastModified: Date.now(),
       });
       return compressedFile;
     } catch (error) {
-      console.error('Error during PDF compression:', error);
+      console.error("Error during PDF compression:", error);
       throw error;
     }
   };
@@ -211,34 +218,34 @@ export function RHFUploadField({
     const fileSizeKiloBytes = file.size / 1024;
     console.log(`Minimum: ${minFileSize}`);
 
-    const fileExt = file?.name.split('.');
-    let error = '';
+    const fileExt = file?.name.split(".");
+    let error = "";
 
     // Validate file name and extension
     if (!file.name) {
-      error = t?.translateValue('cannot_upload_file');
+      error = t?.translateValue("cannot_upload_file");
     } else if (
       // fileExt.length !== 2 ||
       !fileExt[0]
     ) {
-      error = t?.translateValue('cannot_upload_file');
+      error = t?.translateValue("cannot_upload_file");
     } else if (
       allowedExtensionsList?.length > 0 &&
       !allowedExtensionsList?.includes(fileExt[fileExt.length - 1])
     ) {
-      error = t?.translateValue('extension_not_allowed', {
+      error = t?.translateValue("extension_not_allowed", {
         allowed_extensions: allowedExtensionsList
           .slice()
           // .map(ext => {
           //   return parseExtension(ext)
           // })
-          .join(', '),
+          .join(", "),
         extension: fileExt,
       });
     } else if (minFileSize && fileSizeKiloBytes < Number(minFileSize)) {
-      error = t?.translateValue('file_size_cant_be_less_than', {
+      error = t?.translateValue("file_size_cant_be_less_than", {
         size: getSizeInMB(minFileSize),
-        unit: t('megabyte'),
+        unit: t("megabyte"),
       });
     } else {
       setCurrentFiles([file]);
@@ -256,7 +263,7 @@ export function RHFUploadField({
     }
 
     // Check if the file is an image
-    if (file.type.startsWith('image/')) {
+    if (file.type.startsWith("image/")) {
       try {
         // Compress the image
         const options = {
@@ -265,13 +272,13 @@ export function RHFUploadField({
           useWebWorker: true,
         };
 
-        console.log('Compressing file:', file.name);
+        console.log("Compressing file:", file.name);
 
         console.log(`Real File Name: ${file.name}`);
-        console.log('Real File Type', file.type);
+        console.log("Real File Type", file.type);
         const fileName = file.name;
-        const lastDotIndex = fileName.lastIndexOf('.');
-        const baseName = fileName.substring(0, lastDotIndex).replace(/\./g, '');
+        const lastDotIndex = fileName.lastIndexOf(".");
+        const baseName = fileName.substring(0, lastDotIndex).replace(/\./g, "");
         const extension = fileName.substring(lastDotIndex);
         const cleanedFileName = baseName + extension;
         const updatedFile = new File([file], cleanedFileName, {
@@ -279,7 +286,7 @@ export function RHFUploadField({
           lastModified: file.lastModified,
         });
         console.log(`Edited File Name: ${updatedFile.name}`);
-        console.log('Updated File Type', updatedFile.type);
+        console.log("Updated File Type", updatedFile.type);
 
         let compressedFile;
         try {
@@ -288,14 +295,14 @@ export function RHFUploadField({
         } catch {
           compressedFile = updatedFile;
         }
-        console.log('Compressed file size:', compressedFile.size / 1024, 'KB');
+        console.log("Compressed file size:", compressedFile.size / 1024, "KB");
 
         // Check the compressed file size
         const compressedFileSizeKiloBytes = compressedFile.size / 1024;
         if (compressedFileSizeKiloBytes > Number(maxFileSize)) {
-          error = t?.translateValue('file_size_cant_be_larger_than', {
+          error = t?.translateValue("file_size_cant_be_larger_than", {
             size: getSizeInMB(maxFileSize),
-            unit: t['megabyte'],
+            unit: t["megabyte"],
           });
           setError(name, { message: error });
           return;
@@ -305,9 +312,9 @@ export function RHFUploadField({
         setCurrentFiles([compressedFile]);
 
         // Check upload strategy
-        if (uploadStrategy === 'form-data') {
+        if (uploadStrategy === "form-data") {
           const formData = new FormData();
-          formData.append('File', compressedFile);
+          formData.append("File", compressedFile);
 
           // Append Extra Args
           if (Object.keys(destinationExtraArgs).length > 0) {
@@ -319,23 +326,23 @@ export function RHFUploadField({
           const response = await axiosInstance.post(destinationApi, formData, {
             headers: {
               ...(destinationApiToken && { token: destinationApiToken }),
-              'Content-Type': 'multipart/form-data',
+              "Content-Type": "multipart/form-data",
             },
           });
 
-          console.log('Upload response:', response.data);
+          console.log("Upload response:", response.data);
           return response.data.data[responseFileNameKey];
         }
 
-        if (uploadStrategy === 'tempId') {
+        if (uploadStrategy === "tempId") {
           const base64 = await new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => {
-              console.log('TEMPID + Base64 string generated');
+              console.log("TEMPID + Base64 string generated");
               resolve(reader.result);
             };
             reader.onerror = (err) => {
-              console.error('Error reading file:', err);
+              console.error("Error reading file:", err);
               reject(err);
             };
             reader.readAsDataURL(compressedFile);
@@ -344,7 +351,7 @@ export function RHFUploadField({
           const response = await axiosInstance.post(
             destinationApi,
             {
-              File: base64.toString().split('base64,').pop(),
+              File: base64.toString().split("base64,").pop(),
               eFileId: eFileId,
               fileName: compressedFile.name,
               contentLength: compressedFile.size,
@@ -357,25 +364,28 @@ export function RHFUploadField({
             }
           );
 
-          console.log('Upload response:', response.data);
+          console.log("Upload response:", response.data);
           if (!eFileId) {
             setEFileId(response?.data?.data?.eFileId);
           }
 
           const randomFileId = uuidv4().toString();
 
-          return _.get(response.data.data, responseFileNameKey)?.toString() || randomFileId;
+          return (
+            _.get(response.data.data, responseFileNameKey)?.toString() ||
+            randomFileId
+          );
         }
 
-        if (uploadStrategy === 'base64') {
+        if (uploadStrategy === "base64") {
           const base64 = await new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => {
-              console.log('BASE64 + Base64 string generated');
+              console.log("BASE64 + Base64 string generated");
               resolve(reader.result);
             };
             reader.onerror = (err) => {
-              console.error('Error reading file:', err);
+              console.error("Error reading file:", err);
               reject(err);
             };
             reader.readAsDataURL(compressedFile);
@@ -384,7 +394,7 @@ export function RHFUploadField({
           const response = await axiosInstance.post(
             destinationApi,
             {
-              File: base64.toString().split('base64,').pop(),
+              File: base64.toString().split("base64,").pop(),
               fileName: compressedFile.name,
               contentLength: compressedFile.size,
               ...destinationExtraArgs,
@@ -396,29 +406,29 @@ export function RHFUploadField({
             }
           );
 
-          console.log('Upload response:', response.data);
+          console.log("Upload response:", response.data);
           return response.data.data[responseFileNameKey];
         }
       } catch (compressionError) {
-        console.error('Error:', compressionError);
-        setError(name, { message: t?.translateValue('Error') });
+        console.error("Error:", compressionError);
+        setError(name, { message: t?.translateValue("Error") });
         return;
       }
     } else {
       // console.log(maxFileSize);
       console.log(fileSizeKiloBytes);
-      console.log('Compressing file:', file.name);
+      console.log("Compressing file:", file.name);
 
       const compressedFile = await compressAndConvert(file);
 
       const compressedFileSize = compressedFile.size / 1024;
 
-      console.log('Compressed file size:', compressedFileSize, 'KB');
+      console.log("Compressed file size:", compressedFileSize, "KB");
 
       if (maxFileSize && compressedFileSize > Number(maxFileSize)) {
-        error = t?.translateValue('file_size_cant_be_larger_than', {
+        error = t?.translateValue("file_size_cant_be_larger_than", {
           size: getSizeInMB(maxFileSize),
-          unit: t['megabyte'],
+          unit: t["megabyte"],
         });
       }
 
@@ -434,11 +444,11 @@ export function RHFUploadField({
       setCurrentFiles([compressedFile]);
 
       try {
-        if (uploadStrategy === 'form-data') {
+        if (uploadStrategy === "form-data") {
           const formData = new FormData();
 
           // Append File
-          formData.append('File', compressedFile);
+          formData.append("File", compressedFile);
 
           // Append Extra Args
           if (Object.keys(destinationExtraArgs).length > 0) {
@@ -448,15 +458,19 @@ export function RHFUploadField({
           }
 
           try {
-            const response = await axiosInstance.post(destinationApi, formData, {
-              headers: {
-                ...(destinationApiToken && {
-                  token: destinationApiToken,
-                }),
-                'Content-Type': 'multipart/form-data',
-                // access_key: ACCESS_KEY,
-              },
-            });
+            const response = await axiosInstance.post(
+              destinationApi,
+              formData,
+              {
+                headers: {
+                  ...(destinationApiToken && {
+                    token: destinationApiToken,
+                  }),
+                  "Content-Type": "multipart/form-data",
+                  // access_key: ACCESS_KEY,
+                },
+              }
+            );
             // console.log("headers,", ACCESS_KEY)
 
             return response.data.data[responseFileNameKey];
@@ -465,12 +479,12 @@ export function RHFUploadField({
           }
         }
 
-        if (uploadStrategy === 'tempId') {
+        if (uploadStrategy === "tempId") {
           const base64 = await new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
             reader.onerror = (error) => {
-              console.error('FileReader error:', error);
+              console.error("FileReader error:", error);
               reject(error);
             };
             reader.readAsDataURL(compressedFile);
@@ -480,7 +494,7 @@ export function RHFUploadField({
             const response = await axiosInstance.post(
               destinationApi,
               {
-                File: base64.toString().split('base64,').pop(),
+                File: base64.toString().split("base64,").pop(),
                 eFileId: eFileId,
                 fileName: compressedFile.name,
                 contentLength: compressedFile.size,
@@ -502,12 +516,15 @@ export function RHFUploadField({
 
             const randomFileId = uuidv4().toString();
 
-            return _.get(response.data.data, responseFileNameKey)?.toString() || randomFileId;
+            return (
+              _.get(response.data.data, responseFileNameKey)?.toString() ||
+              randomFileId
+            );
           } catch (error) {
             console.log(error);
           }
         }
-        if (uploadStrategy === 'base64') {
+        if (uploadStrategy === "base64") {
           const base64 = await new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
@@ -519,7 +536,7 @@ export function RHFUploadField({
             const response = await axiosInstance.post(
               destinationApi,
               {
-                File: base64.toString().split('base64,').pop(),
+                File: base64.toString().split("base64,").pop(),
                 fileName: compressedFile.name,
                 contentLength: compressedFile.size,
                 ...destinationExtraArgs,
@@ -540,8 +557,8 @@ export function RHFUploadField({
           }
         }
       } catch (error) {
-        console.error('Error uploading non-image file:', error);
-        setError(name, { message: t?.translateValue('file_read_failed') });
+        console.error("Error uploading non-image file:", error);
+        setError(name, { message: t?.translateValue("file_read_failed") });
         return;
       }
     }
@@ -559,7 +576,7 @@ export function RHFUploadField({
       (field.value && field.value.length + files.length > maximimFiles)
     ) {
       setError(name, {
-        message: t?.translateValue('maximum_files_allowed', {
+        message: t?.translateValue("maximum_files_allowed", {
           max: maximimFiles,
         }),
       });
@@ -577,13 +594,13 @@ export function RHFUploadField({
         const file = files[i];
         reader.readAsDataURL(file);
         reader.onloadend = function () {
-          const base64Data = reader.result.split(',')[1];
+          const base64Data = reader.result.split(",")[1];
           file.base64 = base64Data;
         };
         const uploadedFileId = await uploadFile(file);
 
         if (uploadedFileId) {
-          console.log('fileAdded', uploadedFileId);
+          console.log("fileAdded", uploadedFileId);
           uploadedFilesIds.push(uploadedFileId);
           file.id = uploadedFilesIds[0];
           const updatedFiles = !multiple ? [file] : [...currentFiles, file];
@@ -603,20 +620,36 @@ export function RHFUploadField({
 
       if (uploadedFilesIds.length > 0) {
         if (!multiple) {
-          setValue(name + '_filename_display', files[0]?.name?.toString());
-          setValue(name + '_filename', files[0]?.name?.toString()?.replace((/\./g, '-')));
-          setValue(name + '_base64', files[0].base64);
-          setValue(name + '_type', files[0].type);
-          setValue(name + '_attachmentName', attachmentName);
+          setValue(name + "_filename_display", files[0]?.name?.toString());
+          setValue(
+            name + "_filename",
+            files[0]?.name?.toString()?.replace((/\./g, "-"))
+          );
+          setValue(name + "_base64", files[0].base64);
+          setValue(name + "_type", files[0].type);
+          setValue(name + "_attachmentName", attachmentName);
           field.onChange(uploadedFilesIds);
         } else {
-          field.onChange(field.value ? field.value.concat(uploadedFilesIds) : uploadedFilesIds);
+          field.onChange(
+            field.value
+              ? field.value.concat(uploadedFilesIds)
+              : uploadedFilesIds
+          );
           uploadedFilesIds.forEach((id, index) => {
-            setValue(name + id + '_filename_display', String(files[index]?.path));
-            setValue(name + id + '_filename', String(files[index]?.path)?.replace((/\./g, '-')));
-            setValue(name + id + '_base64', files[index].base64);
-            setValue(name + id + '_type', files[index].type);
-            setValue(name + id + '_attachmentName', files[index].attachmentName);
+            setValue(
+              name + id + "_filename_display",
+              String(files[index]?.path)
+            );
+            setValue(
+              name + id + "_filename",
+              String(files[index]?.path)?.replace((/\./g, "-"))
+            );
+            setValue(name + id + "_base64", files[index].base64);
+            setValue(name + id + "_type", files[index].type);
+            setValue(
+              name + id + "_attachmentName",
+              files[index].attachmentName
+            );
           });
         }
       }
@@ -625,12 +658,12 @@ export function RHFUploadField({
     }
   };
   useEffect(() => {
-    console.log('currentFiles', currentFiles);
+    console.log("currentFiles", currentFiles);
   }, [currentFiles]);
 
   useEffect(() => {
-    console.log('other.defaultValue', other.defaultValue);
-    console.log('other.value', other.value);
+    console.log("other.defaultValue", other.defaultValue);
+    console.log("other.value", other.value);
 
     if (other.defaultValue) {
       setValue(name, other?.value || other.defaultValue || []);
@@ -640,21 +673,21 @@ export function RHFUploadField({
     clearErrors(name);
     if (!multiple) {
       field.onChange([]);
-      setValue(name + '_filename', '');
-      setValue(name + '_filename_display', '');
-      setValue(name + '_type', '');
-      setValue(name + '_base64', '');
-      setValue(name + '_attachment_name', '');
+      setValue(name + "_filename", "");
+      setValue(name + "_filename_display", "");
+      setValue(name + "_type", "");
+      setValue(name + "_base64", "");
+      setValue(name + "_attachment_name", "");
       setCurrentFiles([]);
     } else {
       field.onChange(field.value.filter((file) => file !== id));
       // const updatedFiles = field.value.filter((file) => file !== id);
       // field.onChange(updatedFiles.length > 0 ? updatedFiles : []);
-      setValue(name + id + '_filename', '');
-      setValue(name + '_filename_display', '');
-      setValue(name + id + '_type', '');
-      setValue(name + id + '_base64', '');
-      setValue(name + '_attachment_name', '');
+      setValue(name + id + "_filename", "");
+      setValue(name + "_filename_display", "");
+      setValue(name + id + "_type", "");
+      setValue(name + id + "_base64", "");
+      setValue(name + "_attachment_name", "");
       setCurrentFiles(currentFiles.filter((file) => file.id !== id));
     }
   };
@@ -662,10 +695,12 @@ export function RHFUploadField({
 
   const handleOpenViewFileDialog = (id) => {
     if (viewAttachmentApiLink) {
-      if (typeof viewAttachmentApiLink === 'function') {
-        const file = Array.isArray(getValues(name)) ? getValues(name)?.[0] : getValues(name);
+      if (typeof viewAttachmentApiLink === "function") {
+        const file = Array.isArray(getValues(name))
+          ? getValues(name)?.[0]
+          : getValues(name);
         const link = viewAttachmentApiLink(id || file);
-        return window.open(link, '_blank');
+        return window.open(link, "_blank");
       }
     }
 
@@ -673,9 +708,9 @@ export function RHFUploadField({
 
     if (!multiple) {
       selectedFile = {
-        name: getValues(name + '_filename'),
-        type: getValues(name + '_type'),
-        base64: getValues(name + '_base64'),
+        name: getValues(name + "_filename"),
+        type: getValues(name + "_type"),
+        base64: getValues(name + "_base64"),
       };
     } else {
       const myFiles = [];
@@ -683,9 +718,9 @@ export function RHFUploadField({
       for (let i = 0; i < filesIds.length; i++) {
         myFiles.push({
           id: filesIds[i],
-          name: getValues(name + filesIds[i] + '_filename'),
-          type: getValues(name + filesIds[i] + '_type'),
-          base64: getValues(name + filesIds[i] + '_base64'),
+          name: getValues(name + filesIds[i] + "_filename"),
+          type: getValues(name + filesIds[i] + "_type"),
+          base64: getValues(name + filesIds[i] + "_base64"),
         });
       }
 
@@ -698,26 +733,26 @@ export function RHFUploadField({
   const handleCloseViewFileDialog = () => {
     setViewFile(null);
   };
-  const smUp = useResponsive('up', 'sm');
+  const smUp = useResponsive("up", "sm");
   return (
     <div
       style={{
-        position: 'relative',
+        position: "relative",
       }}
     >
       {loading && (
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(255,255,255,0.5)',
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(255,255,255,0.5)",
             zIndex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         ></div>
       )}
@@ -726,29 +761,29 @@ export function RHFUploadField({
         <Stack
           flex={1}
           sx={{
-            position: 'relative',
+            position: "relative",
           }}
         >
           {other?.disabled && (
             <div
               style={{
-                position: 'absolute',
+                position: "absolute",
                 top: 0,
                 left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'rgba(255,255,255,0.5)',
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(255,255,255,0.5)",
                 zIndex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             ></div>
           )}
           <UploadField
             multiple={multiple}
             error={!!error}
-            file={getValues(name + '_filename_display') || getValues(name)}
+            file={getValues(name + "_filename_display") || getValues(name)}
             onDrop={(acceptedFiles) => {
               uploadFiles(acceptedFiles);
             }}
@@ -756,8 +791,9 @@ export function RHFUploadField({
             sx={{
               ...sx,
               ...(error && {
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: (theme) => `${theme.palette.error.main} !important`,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: (theme) =>
+                    `${theme.palette.error.main} !important`,
                 },
               }),
             }}
@@ -768,33 +804,34 @@ export function RHFUploadField({
 
         {!multiple && (field?.value?.length > 0 || !!viewAttachmentApiLink) && (
           <Box>
-            {!viewAttachmentApiLink && getValues(name + '_base64') && (
+            {!viewAttachmentApiLink && getValues(name + "_base64") && (
               <Button
                 variant="contained"
                 color="primary"
                 onClick={handleOpenViewFileDialog}
-                size={!smUp ? 'small' : 'medium'}
+                size={!smUp ? "small" : "medium"}
               >
-                {t['show']}
+                {t["show"]}
               </Button>
             )}
             {!!viewAttachmentApiLink &&
-              ((Array.isArray(getValues(name)) && getValues(name)?.length > 0) ||
-                (typeof getValues(name) === 'string' && getValues(name))) && (
+              ((Array.isArray(getValues(name)) &&
+                getValues(name)?.length > 0) ||
+                (typeof getValues(name) === "string" && getValues(name))) && (
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={handleOpenViewFileDialog}
-                  size={!smUp ? 'small' : 'medium'}
+                  size={!smUp ? "small" : "medium"}
                 >
-                  {t['show']}
+                  {t["show"]}
                 </Button>
               )}
-            {(getValues(name + '_base64') && !viewAttachmentApiLink) ||
+            {(getValues(name + "_base64") && !viewAttachmentApiLink) ||
             (!!viewAttachmentApiLink &&
               Array.isArray(getValues(name)) &&
               getValues(name)?.length > 0) ||
-            (typeof getValues(name) === 'string' && getValues(name)) ? (
+            (typeof getValues(name) === "string" && getValues(name)) ? (
               <Button
                 onClick={removeAttachment}
                 variant="text"
@@ -802,7 +839,7 @@ export function RHFUploadField({
                 color="error"
                 disabled={other?.disabled}
               >
-                {t['remove']}
+                {t["remove"]}
               </Button>
             ) : null}
           </Box>
@@ -815,21 +852,23 @@ export function RHFUploadField({
         <Stack direction="column" gap={1} sx={{ mt: 1 }}>
           {field.value.map((id) => (
             <Stack key={id} direction="row" alignItems="center" gap={1}>
-              <Typography variant="body2">{getValues(name + id + '_filename_display')}</Typography>
+              <Typography variant="body2">
+                {getValues(name + id + "_filename_display")}
+              </Typography>
               <Button
                 onClick={() => removeAttachment(id)}
                 variant="text"
                 size="small"
                 color="error"
               >
-                {t['remove']}
+                {t["remove"]}
               </Button>
               <Button
                 variant="contained"
                 color="primary"
                 onClick={() => handleOpenViewFileDialog(id)}
               >
-                {t['show']}
+                {t["show"]}
               </Button>
             </Stack>
           ))}
@@ -838,25 +877,25 @@ export function RHFUploadField({
       <FormHelperText sx={{ px: 2 }}>
         {
           t[
-            ('file_size_cant_be_larger_than',
+            ("file_size_cant_be_larger_than",
             {
-              size: getSizeInMB(maxFileSize)?.replace('.00', ''),
-              unit: t['megabyte'],
+              size: getSizeInMB(maxFileSize)?.replace(".00", ""),
+              unit: t["megabyte"],
             })
           ]
         }
         <br />
-        {t['allowed_extensions']}:{' '}
+        {t["allowed_extensions"]}:{" "}
         {allowedExtensionsList
           .slice()
           // .map(ext => {
           //   return parseExtension(ext)
           // })
-          .join(', ')}
+          .join(", ")}
         <br />
         {!!multiple &&
           t[
-            ('maximum_files_allowed',
+            ("maximum_files_allowed",
             {
               max: maximimFiles,
             })
@@ -874,50 +913,61 @@ export function RHFUploadField({
         <>
           <Dialog
             fullWidth
-            maxWidth={'md'}
+            maxWidth={"md"}
             open
             onClose={handleCloseViewFileDialog}
             sx={{
-              overflow: 'hidden',
+              overflow: "hidden",
             }}
           >
             <IconButton
               onClick={handleCloseViewFileDialog}
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 top: (theme) => theme.spacing(1),
                 right: (theme) => theme.spacing(1),
                 zIndex: 1000,
               }}
             >
-              <SvgColor src="/assets/icons/designer/close.svg" color="text.secondary" width={24} />
+              <SvgColor
+                src="/assets/icons/designer/close.svg"
+                color="text.secondary"
+                width={24}
+              />
             </IconButton>
             <hr></hr>
             <DialogTitle
-              sx={{ maxWidth: '100%', pb: 1, textAlign: 'center', overflowWrap: 'break-word' }}
+              sx={{
+                maxWidth: "100%",
+                pb: 1,
+                textAlign: "center",
+                overflowWrap: "break-word",
+              }}
             >
               <Typography variant="h6">{viewFile?.name}</Typography>
             </DialogTitle>
 
             {/* <DialogContent */}
-            {viewFile?.type === 'application/pdf' ? (
+            {viewFile?.type === "application/pdf" ? (
               <iframe src={`data:application/pdf;base64,${viewFile?.base64}`} />
             ) : (
               <Box
                 sx={{
-                  '&::-webkit-scrollbar': {
-                    display: 'none',
+                  "&::-webkit-scrollbar": {
+                    display: "none",
                   },
                   // width: "100%",
-                  height: '100%',
-                  display: 'flex',
-                  alignContent: 'center',
-                  justifyContent: 'center',
+                  height: "100%",
+                  display: "flex",
+                  alignContent: "center",
+                  justifyContent: "center",
                   pb: 4,
                   px: 4,
                 }}
               >
-                <img src={`data:${viewFile?.type};base64,${viewFile?.base64}`} />
+                <img
+                  src={`data:${viewFile?.type};base64,${viewFile?.base64}`}
+                />
               </Box>
             )}
 

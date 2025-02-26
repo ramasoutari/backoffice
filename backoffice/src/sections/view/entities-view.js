@@ -19,7 +19,7 @@ import ViewEntityDialog from "./dialogs/view-entity-dialog";
 const EntitiesView = () => {
   const settings = useSettingsContext();
   const { t } = useLocales();
-  const direction = i18n.language === "ar" ? "ltr" : "rtl";
+  const direction = i18n.language === "ar" ? "rtl" : "ltr";
   const globalDialog = useGlobalDialogContext();
   const globalPrompt = useGlobalPromptContext();
   const getEntities = useGetEntities();

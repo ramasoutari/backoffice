@@ -33,7 +33,7 @@ import { useGlobalPromptContext } from "../../components/global-prompt";
 const UsersView = () => {
   const settings = useSettingsContext();
   const { t } = useLocales();
-  const direction = i18n.language === "ar" ? "ltr" : "rtl";
+  const direction = i18n.language === "ar" ? "rtl" : "ltr";
   const globalDialog = useGlobalDialogContext();
   const getUsers = useGetUsers();
   const deleteUser = useDeleteUser();

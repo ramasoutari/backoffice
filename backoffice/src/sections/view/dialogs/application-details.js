@@ -46,7 +46,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
 
   const { t } = useLocales();
   const formRef = useRef();
-  const direction = i18n.language === "ar" ? "ltr" : "rtl";
+  const direction = i18n.language === "ar" ? "rtl" : "ltr";
   useEffect(() => {
     if (ApplicaitonNumber) {
       getApplication.mutate({

@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // @mui
-import { alpha } from '@mui/material/styles';
+import { alpha } from "@mui/material/styles";
 import {
   Checkbox,
   FormHelperText,
@@ -9,7 +9,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-} from '@mui/material';
+} from "@mui/material";
 
 export default function ListPicker({
   error,
@@ -52,8 +52,8 @@ export default function ListPicker({
   return (
     <List
       sx={{
-        width: '100%',
-        bgcolor: 'background.paper',
+        width: "100%",
+        bgcolor: "background.paper",
         p: 0,
         ...sx,
       }}
@@ -81,7 +81,11 @@ export default function ListPicker({
           </ListItem>
         );
       })}
-      {(!!error || helperText) && <FormHelperText error={!!error}>{helperText}</FormHelperText>}
+      {(!!error || helperText) && (
+        <FormHelperText error={!!error} sx={{ textAlign: "right" }}>
+          {helperText}
+        </FormHelperText>
+      )}
     </List>
   );
 }
@@ -94,7 +98,9 @@ ListPicker.propTypes = {
       value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     })
   ),
-  checked: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])),
+  checked: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ),
   onChange: PropTypes.func,
   helperText: PropTypes.string,
   sx: PropTypes.object,

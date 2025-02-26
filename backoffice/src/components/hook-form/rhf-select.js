@@ -450,7 +450,7 @@ export function RHFMultiSelect({
           </Select>
 
           {(!!error || helperText) && (
-            <FormHelperText error={!!error}>
+            <FormHelperText error={!!error} sx={{textAlign: 'right'}}>
               {error ? error?.message : helperText}
             </FormHelperText>
           )}
