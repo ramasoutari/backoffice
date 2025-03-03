@@ -97,7 +97,7 @@ const ApplicationsView = () => {
       ),
     },
     {
-      id: "status",
+      id: "statusAr",
       label: t("order_status"),
       renderRow: (row, column) => (
         <Label variant="ghost" sx={{}}>
@@ -146,6 +146,7 @@ const ApplicationsView = () => {
                 height: "41.48px",
                 bgcolor: button.color,
                 borderRadius: "8px",
+                textAlign: "center",
                 color: "white",
                 fontSize: "14px",
                 "&:hover": {
@@ -180,7 +181,7 @@ const ApplicationsView = () => {
                 height: "716px",
                 borderRadius: "8px",
                 border: "1px solid black",
-                overflow: "hidden",
+                overflow: "auto",
                 position: "center",
               }}
             >
@@ -201,8 +202,8 @@ const ApplicationsView = () => {
                     >
                       <Button
                         style={{
-                          backgroundColor: "#ffffff",
-                          color: "#B0B0B0",
+                          backgroundColor: "#D4AF37",
+                          color: "#FFFFFF",
                           borderRadius: "4px",
                           padding: "8px 16px",
                           cursor: "pointer",

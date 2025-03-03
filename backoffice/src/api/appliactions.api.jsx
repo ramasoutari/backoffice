@@ -30,15 +30,16 @@ export function useGetApplication() {
   });
 }
 export async function submitApplication(data) {
-  console.log("data", data);
+  const query = data.currentDialog
+    ? Number(data.currentDialog)
+    : data.buttonIndex;
+  console.log("query", query);
   return await axiosInstance
     .post(
-      `/workflow/${data.ApplicaitonNumber}/transition?choice=${
-        data.currentDialog || data.buttonIndex
-      }`,
-      data.rejection_reason
+      `/workflow/${data.ApplicaitonNumber}/transition?choice=${query}`,
+      data.rejectionReason
         ? {
-            rejection_reason: data.rejection_reason,
+            rejectionReason: data.rejectionReason,
           }
         : data.type || data.title
         ? [
@@ -53,8 +54,12 @@ export async function submitApplication(data) {
 }
 
 export function useSubmitApplication() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: submitApplication,
-    onSuccess: () => {},
+    onSuccess: () => {
+      queryClient.invalidateQueries(["getApplications"]);
+    },
   });
 }

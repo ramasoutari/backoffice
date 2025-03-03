@@ -129,6 +129,7 @@ const DahboardView = () => {
                 height: "41.48px",
                 bgcolor: button.color,
                 borderRadius: "8px",
+                textAlign: "center",
                 color: "white",
                 fontSize: "14px",
                 "&:hover": {

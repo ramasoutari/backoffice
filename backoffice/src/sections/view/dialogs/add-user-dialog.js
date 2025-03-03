@@ -1,6 +1,4 @@
 import {
-  Alert,
-  AlertTitle,
   Box,
   Button,
   Dialog,
@@ -8,23 +6,12 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  Typography,
 } from "@mui/material";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useGlobalDialogContext } from "../../../components/global-dialog";
 import { useLocales } from "../../../locales";
 import DynamicForm, { getForm } from "../../../components/dynamic-form";
-import i18n from "../../../locales/i18n";
-import { Stack } from "@mui/system";
-import { useGlobalPromptContext } from "../../../components/global-prompt";
-import { color } from "framer-motion";
-import { options } from "numeral";
-import axiosInstance from "../../../utils/axios";
-import { HOST_API } from "../../../config-global";
-import {
-  useGetDepartmentRoles,
-  useGetDepartments,
-} from "../../../api/departments.api";
+
 import { useRegisterUser, useUpdateUser } from "../../../api/users.api";
 import toast from "react-hot-toast";
 
@@ -32,16 +19,12 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [dialogType, setDialogType] = useState("");
-  const [departmentRoles, setDepartmentRoles] = useState(false);
   const globalDialog = useGlobalDialogContext();
-  const globalPrompt = useGlobalPromptContext();
   const { t } = useLocales();
   const registerUser = useRegisterUser();
   const updateUser = useUpdateUser();
 
   const [isLoading, startLoading] = useState(false);
-  const direction = i18n.language === "ar" ? "rtl" : "ltr";
-
   const form = getForm([
     {
       fieldVariable: "nationalNumber",
@@ -305,8 +288,10 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
       familyName: user?.familyName || "",
       phoneNumber: user?.phoneNumber || "",
       email: user?.email || "",
-      departmentId: user?.departmentId || "",
-      roleIds: user?.roleIds || [],
+      departmentId: user?.department?.id || "",
+      roleIds: Array.isArray(user?.roles)
+        ? user?.roles.map((role) => role.id)
+        : [],
     };
   }, [user]);
 
@@ -349,34 +334,14 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
     }
   };
 
-  const handleOpenDialog = (type) => {
-    setDialogType(type);
-    setDialogOpen(true);
-  };
-
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setReason("");
   };
-  const handleApprove = () => {
-    globalPrompt.onOpen({
-      type: "success",
-      content: (
-        <Stack direction="column" spacing={1}>
-          <Typography component="h6" variant="h6" fontWeight="fontWeightBold">
-            {t("successfully")}
-          </Typography>
-        </Stack>
-      ),
-      promptProps: {
-        icon: "success",
-      },
-    });
-  };
 
   return (
-    <Box sx={direction} py={3}>
-      <Box sx={{ direction }}>
+    <Box sx={{ position: "inherit", overflow: "hidden" }} py={3}>
+      <Box sx={{ position: "inherit" }}>
         <DynamicForm
           {...form}
           defaultValues={defaultValues}
@@ -420,7 +385,7 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
           "& .MuiDialog-paper": {
             width: "684px",
             height: "400.71px",
-            position: "absolute",
+            position: "fixed",
             borderRadius: "8px",
           },
         }}

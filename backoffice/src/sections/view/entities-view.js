@@ -15,6 +15,7 @@ import {
 } from "../../api/entities.api";
 import Label from "../../components/label";
 import ViewEntityDialog from "./dialogs/view-entity-dialog";
+import EmptyContent from "../../components/empty-content";
 
 const EntitiesView = () => {
   const settings = useSettingsContext();
@@ -149,6 +150,7 @@ const EntitiesView = () => {
                 columns={columns}
                 loading={getEntities.isFetching}
                 rows={EntitiesArr || []}
+                emptyText={<EmptyContent hideImg title={t("no_data")} />}
                 renderActions={(row) => {
                   console.log("Action row data:", row);
 
@@ -276,7 +278,6 @@ const EntitiesView = () => {
                       >
                         {t("delete")}
                       </Button>
-                   
                     </Box>
                   );
                 }}

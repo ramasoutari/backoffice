@@ -413,7 +413,7 @@
   "view_user": "معلومات المستخدم",
   "delete_user": "هل انت متأكد من حذف المستخدم؟",
   "noObjectionAttachment": "عدم الممانعة",
-  "additional_attachments": "مرفقات اضافية",
+  "additional_attachments": "اثبات امتلاك المحطة",
   "environmentalAttachment": "دراسة الأثر البيئي (مرفق من وزارة البيئة)",
   "soilTestAttachment": "تقرير فحص التربة (مرفق من مكتب هندسي معتمد)",
   "successfully_submitted": "تم تقديم الطلب نجاح",
@@ -422,5 +422,5 @@
   "label": "المعلومة المطلوبة",
   "delete": "حذف",
   "entity_delete": "هل انت متأكد من حذف المنشأة؟",
-  "rejection_reason_label":"اسباب الرفض"
+  "rejection_reason_label": "اسباب الرفض"
 }

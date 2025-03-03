@@ -3,6 +3,7 @@ import {
   AlertTitle,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -36,6 +37,8 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
   const [currentDialog, setCurrentDialog] = useState(-1);
   const [reason, setReason] = useState("");
   const [type, setType] = useState();
+  const [loading, setLoading] = useState(false);
+  const [loadingApprove, setLoadingApprove] = useState(false);
   const [title, setTitle] = useState("");
   const [dialogType, setDialogType] = useState("");
   const globalDialog = useGlobalDialogContext();
@@ -145,27 +148,31 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
   );
 
   const handleOpenDialog = (type, index) => {
+    console.log("index", index);
     setDialogType(type);
     setCurrentDialog(index);
   };
 
   const handleCloseDialog = () => {
     setCurrentDialog(-1);
-    setReason("");
-    setType("");
-    setType("");
+    globalDialog.onClose();
+    setReason();
+    setType();
+    setType();
   };
 
   const handleSubmitReason = useCallback(() => {
+    setLoading(true);
     if (dialogType === "rejected") {
       submitApplication.mutate(
         {
           ApplicaitonNumber,
-          currentDialog,
-          rejection_reason: reason,
+          currentDialog: currentDialog.toString(),
+          rejectionReason: reason,
         },
         {
           onSuccess: () => {
+            setCurrentDialog(-1);
             handleCloseDialog();
             globalPrompt.onOpen({
               type: "success",
@@ -184,19 +191,24 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                 icon: "success",
               },
             });
+            setTimeout(() => {
+              globalPrompt.onClose();
+            }, 3000);
           },
+          onSettled: () => setLoading(false),
         }
       );
     } else if (dialogType === "edit") {
       submitApplication.mutate(
         {
           ApplicaitonNumber,
-          currentDialog,
+          currentDialog: currentDialog.toString(),
           type,
           title,
         },
         {
           onSuccess: () => {
+            setCurrentDialog(-1);
             handleCloseDialog();
             globalPrompt.onOpen({
               type: "success",
@@ -216,6 +228,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
               },
             });
           },
+          onSettled: () => setLoading(false),
         }
       );
     }
@@ -232,14 +245,15 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
     t,
   ]);
   const handleApprove = (buttonIndex) => {
+    setLoadingApprove(true);
     submitApplication.mutate(
       {
         ApplicaitonNumber,
         buttonIndex,
       },
-      {},
       {
         onSuccess: () => {
+          globalDialog.onClose();
           globalPrompt.onOpen({
             type: "success",
             content: (
@@ -249,7 +263,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                   variant="h6"
                   fontWeight="fontWeightBold"
                 >
-                  {t("successfully")}
+                  {t("successfully_submitted")}
                 </Typography>
               </Stack>
             ),
@@ -258,6 +272,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
             },
           });
         },
+        onSettled: () => setLoadingApprove(false),
       }
     );
   };
@@ -328,29 +343,24 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
               {t("environmentalAttachment")}:
             </Typography>
             <Box display="flex" alignItems="center">
-              {applicationInfo.environmantalAttachments.map(
-                (attach, index) => (
-                  <Box key={index} display="flex" flexDirection="column" mr={1}>
-                    <Button
-                      onClick={() =>
-                        window.open(
-                          `${FILES_API}/${attach.fileName}`,
-                          "_blank"
-                        )
-                      }
-                      size="small"
-                      sx={{
-                        backgroundColor: "#e6e6e6",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography px={0.5}>{attach.fileName}</Typography>
-                      <Iconify icon={"mdi:eye"} width={15} />
-                    </Button>
-                  </Box>
-                )
-              )}
+              {applicationInfo.environmantalAttachments.map((attach, index) => (
+                <Box key={index} display="flex" flexDirection="column" mr={1}>
+                  <Button
+                    onClick={() =>
+                      window.open(`${FILES_API}/${attach.fileName}`, "_blank")
+                    }
+                    size="small"
+                    sx={{
+                      backgroundColor: "#e6e6e6",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography px={0.5}>{attach.fileName}</Typography>
+                    <Iconify icon={"mdi:eye"} width={15} />
+                  </Button>
+                </Box>
+              ))}
             </Box>
           </Box>
         )}
@@ -364,10 +374,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                 <Box key={index} display="flex" flexDirection="column" mr={1}>
                   <Button
                     onClick={() =>
-                      window.open(
-                        `${FILES_API}/${attach.fileName}`,
-                        "_blank"
-                      )
+                      window.open(`${FILES_API}/${attach.fileName}`, "_blank")
                     }
                     size="small"
                     sx={{
@@ -394,10 +401,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                 <Box key={index} display="flex" flexDirection="column" mr={1}>
                   <Button
                     onClick={() =>
-                      window.open(
-                        `${FILES_API}/${attach.fileName}`,
-                        "_blank"
-                      )
+                      window.open(`${FILES_API}/${attach.fileName}`, "_blank")
                     }
                     size="small"
                     sx={{
@@ -424,10 +428,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                 <Box key={index} display="flex" flexDirection="column" mr={1}>
                   <Button
                     onClick={() =>
-                      window.open(
-                        `${FILES_API}/${attach.fileName}`,
-                        "_blank"
-                      )
+                      window.open(`${FILES_API}/${attach.fileName}`, "_blank")
                     }
                     size="small"
                     sx={{
@@ -465,7 +466,13 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
               );
             }
 
-            if (item === "field_inspection") {
+            if (
+              item === "field_inspection" ||
+              item === "energy_mineral" ||
+              item === "interior_ministry" ||
+              item === "prevention_protection" ||
+              item === "accept_application"
+            ) {
               return (
                 <Button
                   key={index}
@@ -479,12 +486,19 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                     borderRadius: "8px",
                   }}
                 >
-                  {t("approve")}
+                  {loadingApprove ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    t("approve")
+                  )}
                 </Button>
               );
             }
 
-            if (item === "extra_Info_backoffice") {
+            if (
+              item === "extra_Info_backoffice" ||
+              item === "extra_Info_energy"
+            ) {
               return (
                 <Button
                   key={index}
@@ -561,7 +575,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 sx={{
-                  mb: 2, // Add margin-bottom
+                  mb: 2,
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
                       borderColor: "black",
@@ -634,7 +648,11 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
               borderRadius: "8px",
             }}
           >
-            {t("send")}
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              t("send")
+            )}
           </Button>
         </DialogActions>
       </Dialog>

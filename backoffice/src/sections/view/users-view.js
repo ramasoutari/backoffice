@@ -24,10 +24,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import Table from "../../components/table copy/table";
 import { useGlobalDialogContext } from "../../components/global-dialog";
 import AddUserDialog from "./dialogs/add-user-dialog";
-import {
-  useDeleteUser,
-  useGetUsers,
-} from "../../api/users.api";
+import { useDeleteUser, useGetUsers } from "../../api/users.api";
 import { useGlobalPromptContext } from "../../components/global-prompt";
 
 const UsersView = () => {
@@ -51,7 +48,7 @@ const UsersView = () => {
         <>
           {(!row.isMigrated && !(row?.applicationType?.length > 0)) ||
           [].includes(row?.applicationType) ? (
-            <Label variant="ghost" sx={{}}>
+            <Label variant="ghost">
               {row[column.id]}
             </Label>
           ) : (
@@ -82,16 +79,26 @@ const UsersView = () => {
       id: "department",
       label: t("department"),
       renderRow: (row, column) => (
-        <Label variant="ghost" sx={{}}>
-          {row[column.id]}
+        <Label variant="ghost"> {row[column.id]?.nameAr ?? "-"}</Label>
+      ),
+    },
+    {
+      id: "roles",
+      label: t("role"),
+      renderRow: (row, column) => (
+        <Label variant="ghost">
+          {Array.isArray(row[column.id]) && row[column.id].length > 0
+            ? row[column.id].map((role) => role.role).join(", ")
+            : "-"}
         </Label>
       ),
     },
+
     {
       id: "deactivated",
       label: t("status"),
       renderRow: (row) => (
-        <Label variant="ghost" sx={{}}>
+        <Label variant="ghost">
           {row.deactivated ? t("deactivated") : t("activated")}
         </Label>
       ),
@@ -108,9 +115,7 @@ const UsersView = () => {
       title: t("view_user"),
       content: <AddUserDialog user={user} viewOnly={true} />,
       dialogProps: {
-        dismissable: true,
         maxWidth: "lg",
-        sx: { backgroudColor: "red" },
       },
     });
   };
@@ -122,7 +127,6 @@ const UsersView = () => {
       dialogProps: {
         dismissable: true,
         maxWidth: "lg",
-        sx: { backgroudColor: "red" },
       },
     });
   };
@@ -133,7 +137,6 @@ const UsersView = () => {
       dialogProps: {
         dismissable: true,
         maxWidth: "lg",
-        sx: { backgroudColor: "red" },
       },
     });
   };
@@ -232,13 +235,21 @@ const UsersView = () => {
                       </IconButton>
                       <IconButton
                         color="primary"
-                        onClick={() => onDetailsClick(row)}
+                        onClick={() =>
+                          onDetailsClick(
+                            usersArr.find((user) => user.id === row.id)
+                          )
+                        }
                       >
                         <VisibilityIcon />
                       </IconButton>
                       <IconButton
                         color="warning"
-                        onClick={() => handleEdit(row)}
+                        onClick={() =>
+                          handleEdit(
+                            usersArr.find((user) => user.id === row.id)
+                          )
+                        }
                       >
                         <BorderColorIcon />
                       </IconButton>

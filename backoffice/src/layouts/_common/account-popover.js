@@ -113,12 +113,12 @@ export default function AccountPopover() {
       /> */}
       <Box>
         {/* <TextMaxLine sx={{ filter: 'blur(5px)' }} variant="body2" fontWeight="fontWeightBold" line={2}> */}
-
         <TextMaxLine variant="body2" fontWeight="fontWeightBold" line={2}>
-          {user?.username}
+          {user?.firstName}
+          {"    "}
+          {user?.familyName}
         </TextMaxLine>
-
-        {user?.desc && (
+        {user?.roles?.length > 0 && (
           <Typography
             component="p"
             variant="caption"
@@ -128,7 +128,7 @@ export default function AccountPopover() {
               m: 0,
             }}
           >
-            {user.desc}
+            {user.roles.map((role) => role.role).join(", ")}
           </Typography>
         )}
       </Box>

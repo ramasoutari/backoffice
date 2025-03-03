@@ -9,6 +9,7 @@ const ROOTS = {
 
 export const paths = {
   notAuthorized: `/403`,
+
   // AUTH
   auth: {
     jwt: {

@@ -110,11 +110,11 @@ export default function JwtIndividualLoginView() {
             />
           }
         </Stack>
-        <Typography variant="body2" color="inherit">
+        {/* <Typography variant="body2" color="inherit">
           <RouterLink to={paths.auth.jwt.forgotPassword}>
             {t("forgot_password")}
           </RouterLink>
-        </Typography>
+        </Typography> */}
       </Stack>
       <Stack
         alignItems="center"
