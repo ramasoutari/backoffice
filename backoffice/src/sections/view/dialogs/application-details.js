@@ -59,8 +59,35 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
 
   const applicationInfo = getApplication.data?.application;
   const stepDataInfo = getApplication.data?.stepData;
-
+  const extraFields =
+    applicationInfo?.extraRequestedInfo
+      ?.map((info) => {
+        if (info.type === "002" || info.textField?.trim()) {
+          return {
+            fieldVariable: "extraRequestedInfo",
+            label: info.title,
+            placeholder: info.title,
+            value: info.textField || "",
+            type: "input",
+            typeValue: "string",
+            disabled: true,
+            validations: [
+              {
+                type: "required",
+                message: t("required"),
+              },
+            ],
+            gridOptions: [
+              { breakpoint: "xs", size: 12 },
+              { breakpoint: "md", size: 4 },
+            ],
+          };
+        }
+        return null;
+      })
+      .filter(Boolean) ?? [];
   const form = getForm([
+    ...extraFields,
     {
       fieldVariable: "extraInfo",
       label: "notes",
@@ -143,6 +170,10 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
         applicationInfo?.noObjectionAttachment?.[0]?.id || "",
       phoneNumber: applicationInfo?.phoneNumber || "",
       email: applicationInfo?.email || "",
+      extraRequestedInfo:
+        applicationInfo?.extraRequestedInfo?.map(
+          (info) => info.textField || ""
+        ) || [],
     }),
     [applicationInfo]
   );
@@ -290,7 +321,7 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
           <Typography component="span" sx={{ fontWeight: "bold" }}>
             {t("order_status")} :
           </Typography>{" "}
-          <Typography component="span">{applicationInfo?.status}</Typography>
+          <Typography component="span">{applicationInfo?.statusAr}</Typography>
         </Typography>
         <Typography>
           <Typography component="span" sx={{ fontWeight: "bold" }}>
@@ -445,6 +476,50 @@ const ApplicationDetails = ({ ApplicaitonNumber }) => {
             </Box>
           </Box>
         )}
+        {applicationInfo?.extraRequestedInfo?.map((info, index) => {
+          if (
+            info.type === "001" ||
+            (info.attachmentField && info.attachmentField.length > 0)
+          ) {
+            return (
+              <Box
+                key={index}
+                display="flex"
+                flexDirection="column"
+                alignItems="flex-start"
+              >
+                <Typography fontWeight="500" p={1}>
+                  {info.title}:
+                </Typography>
+                <Box display="flex" alignItems="center">
+                  {info.attachmentField.map((attach, idx) => (
+                    <Box key={idx} display="flex" flexDirection="column" mr={1}>
+                      <Button
+                        onClick={() =>
+                          window.open(
+                            `${FILES_API}/${attach.fileName}`,
+                            "_blank"
+                          )
+                        }
+                        size="small"
+                        sx={{
+                          backgroundColor: "#e6e6e6",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Typography px={0.5}>{attach.fileName}</Typography>
+                        <Iconify icon={"mdi:eye"} width={15} />
+                      </Button>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            );
+          }
+          return null;
+        })}
+
         <Stack direction="row" gap={2} my={2} mx={7}>
           {stepDataInfo?.to.map((item, index) => {
             if (item === "decline_application") {
