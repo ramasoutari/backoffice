@@ -114,7 +114,6 @@ const ApplicationsView = () => {
   ];
 
   const onDetailsClick = (application) => {
-    console.log("nnmnnnnnnnnnnnnn", application);
     globalDialog.onOpen({
       title: t("application_details"),
       content: <ApplicationDetails ApplicaitonNumber={application.id} />,

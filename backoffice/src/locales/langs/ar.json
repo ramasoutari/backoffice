@@ -422,5 +422,6 @@
   "label": "المعلومة المطلوبة",
   "delete": "حذف",
   "entity_delete": "هل انت متأكد من حذف المنشأة؟",
-  "rejection_reason_label": "اسباب الرفض"
+  "rejection_reason_label": "اسباب الرفض",
+  "successfully_deleted": "تم حذف المستخدم بنجاح"
 }

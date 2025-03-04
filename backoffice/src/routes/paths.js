@@ -26,5 +26,6 @@ export const paths = {
     applications: `${ROOTS.DASHBOARD}/applications`,
     users: `${ROOTS.DASHBOARD}/users`,
     entities: `${ROOTS.DASHBOARD}/entities`,
+    // notification_center: `${ROOTS.DASHBOARD}/notifications`,
   },
 };

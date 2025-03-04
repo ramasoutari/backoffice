@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Typography,
 } from "@mui/material";
 import React, { useMemo, useState } from "react";
 import { useGlobalDialogContext } from "../../../components/global-dialog";
@@ -14,6 +15,8 @@ import DynamicForm, { getForm } from "../../../components/dynamic-form";
 
 import { useRegisterUser, useUpdateUser } from "../../../api/users.api";
 import toast from "react-hot-toast";
+import { useGlobalPromptContext } from "../../../components/global-prompt";
+import { Stack } from "@mui/system";
 
 const AddUserDialog = ({ user, viewOnly = false }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -23,6 +26,7 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
   const { t } = useLocales();
   const registerUser = useRegisterUser();
   const updateUser = useUpdateUser();
+  const globalPrompt = useGlobalPromptContext();
 
   const [isLoading, startLoading] = useState(false);
   const form = getForm([
@@ -31,7 +35,7 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
       label: "national_id",
       placeholder: "national_id",
       value: "",
-      disabled: viewOnly,
+      disabled: viewOnly || Boolean(user),
       type: "input",
       typeValue: "string",
       gridOptions: [
@@ -281,7 +285,7 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
 
   const defaultValues = useMemo(() => {
     return {
-      nationalNumber: user?.nationalNumber || "",
+      nationalNumber: user?.username || "",
       firstName: user?.firstName || "",
       fatherName: user?.fatherName || "",
       grandfatherName: user?.grandfatherName || "",
@@ -311,13 +315,30 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
           roleIds: data.roleIds,
         });
         globalDialog.onClose();
-        toast.success(t("successfully_saved"));
+        globalPrompt.onOpen({
+          type: "success",
+          content: (
+            <Stack direction="column" spacing={1}>
+              <Typography
+                component="h6"
+                variant="h6"
+                fontWeight="fontWeightBold"
+              >
+                {t("successfully_submitted")}
+              </Typography>
+            </Stack>
+          ),
+          promptProps: {
+            icon: "success",
+          },
+        });
       });
     } else {
       startLoading(async () => {
         await updateUser.mutateAsync({
           id: user.id,
           data: {
+            nationalNumber: data.nationalNumber,
             firstName: data.firstName,
             fatherName: data.fatherName,
             grandfatherName: data.grandfatherName,
@@ -329,7 +350,23 @@ const AddUserDialog = ({ user, viewOnly = false }) => {
           },
         });
         globalDialog.onClose();
-        toast.success(t("successfully_saved"));
+        globalPrompt.onOpen({
+          type: "success",
+          content: (
+            <Stack direction="column" spacing={1}>
+              <Typography
+                component="h6"
+                variant="h6"
+                fontWeight="fontWeightBold"
+              >
+                {t("successfully_submitted")}
+              </Typography>
+            </Stack>
+          ),
+          promptProps: {
+            icon: "success",
+          },
+        });
       });
     }
   };

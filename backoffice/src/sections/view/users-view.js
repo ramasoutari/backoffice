@@ -42,15 +42,13 @@ const UsersView = () => {
 
   const columns = [
     {
-      id: "nationalNumber",
+      id: "username",
       label: t("national_id"),
       renderRow: (row, column) => (
         <>
           {(!row.isMigrated && !(row?.applicationType?.length > 0)) ||
           [].includes(row?.applicationType) ? (
-            <Label variant="ghost">
-              {row[column.id]}
-            </Label>
+            <Label variant="ghost">{row[column.id]}</Label>
           ) : (
             row[column.id]
           )}
@@ -265,6 +263,23 @@ const UsersView = () => {
                               onConfirm: async () => {
                                 await deleteUser.mutateAsync({ id: row.id });
                                 globalPrompt.onClose();
+                                globalPrompt.onOpen({
+                                  type: "success",
+                                  content: (
+                                    <Stack direction="column" spacing={1}>
+                                      <Typography
+                                        component="h6"
+                                        variant="h6"
+                                        fontWeight="fontWeightBold"
+                                      >
+                                        {t("successfully_deleted")}
+                                      </Typography>
+                                    </Stack>
+                                  ),
+                                  promptProps: {
+                                    icon: "success",
+                                  },
+                                });
                               },
                               onCancel: () => {},
                             },

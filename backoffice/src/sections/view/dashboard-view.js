@@ -6,14 +6,19 @@ import { useState } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useGetApplications } from "../../api/appliactions.api";
+import { useAuthContext } from "../../auth/hooks";
 
 const DahboardView = () => {
   const settings = useSettingsContext();
   const { t } = useLocales();
   const direction = i18n.language === "ar" ? "rtl" : "ltr";
+  const { user } = useAuthContext();
 
   const [layout, setLayout] = useState("vertical");
   const [radius, setRadius] = useState(10);
+  const getApplications = useGetApplications();
+
   const [applicationCounts, setApplicationCounts] = useState({
     all: 150,
     approved: 45,
@@ -21,44 +26,43 @@ const DahboardView = () => {
     rejected: 20,
     returned: 25,
   });
-
   const buttons = [
-    { title: "جميع الطلبات", color: "#D4AF37", count: 2 },
+    { title: "الكل", color: "#D4AF37", count: 9 },
     {
-      title: "الطلبات الجديدة",
+      title: "جديد",
       color: "#000000",
-      status: "SUBMITTED",
+      status: "Submitted",
+      count: 5,
+    },
+    {
+      title: "قيد العمل",
+      color: "#2E8B57",
+      status: "InProgress",
       count: 4,
     },
     {
-      title: "الطلبات قيد العمل",
-      color: "#2E8B57",
-      status: "IN_PROGRESS",
-      count: 8,
-    },
-    {
-      title: "الطلبات اللتي بحاجة لمعلومات الاضافية",
+      title: "بحاجة لمعلومات الاضافية",
       color: "#C2B280",
-      status: "EXTRA_INFO",
-      count: 6,
-    },
-    {
-      title: "الطلبات الكشف الميداني",
-      color: "#005691",
-      status: "INSPECTION",
-      count: 9,
-    },
-    {
-      title: "الطلبات المرفوضة",
-      color: "#CC5500",
-      status: "DECLINED",
-      count: 10,
-    },
-    {
-      title: "الطلبات الموافق عليها",
-      color: "#4F4F4F",
-      status: "ACCEPTED",
+      status: "ExtraInfo",
       count: 5,
+    },
+    {
+      title: "الكشف الميداني",
+      color: "#005691",
+      status: "Inspection",
+      count: 2,
+    },
+    {
+      title: "مرفوض",
+      color: "#CC5500",
+      status: "Declined",
+      count: 1,
+    },
+    {
+      title: "الموافق عليها",
+      color: "#4F4F4F",
+      status: "Accepted",
+      count: 3,
     },
   ];
 
@@ -67,14 +71,13 @@ const DahboardView = () => {
     value: button.count,
     color: button.color,
   }));
-
   const commonChartSettings = {
     dataset: chartData,
     height: 400,
     series: [
       {
         data: chartData.map((item) => item.value),
-        color: chartData.map((item) => item.color),
+        color: "#4F4F4F",
       },
     ],
     slotProps: {
@@ -125,7 +128,7 @@ const DahboardView = () => {
             <Button
               key={index}
               sx={{
-                width: "165.83px",
+                width: "167.83px",
                 height: "41.48px",
                 bgcolor: button.color,
                 borderRadius: "8px",
@@ -136,6 +139,12 @@ const DahboardView = () => {
                   bgcolor: button.color,
                   opacity: 0.9,
                 },
+              }}
+              onClick={() => {
+                getApplications.mutateAsync({
+                  id: user?.departmentId,
+                  status: button.status,
+                });
               }}
             >
               {button.title}
