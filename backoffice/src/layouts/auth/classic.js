@@ -74,7 +74,7 @@ export default function AuthClassicLayout({ children }) {
           {/* Form Container */}
           <Box
             sx={{
-              width:"700px",
+              width: "700px",
               flex: 1,
               display: "flex",
               justifyContent: "center",
@@ -89,11 +89,12 @@ export default function AuthClassicLayout({ children }) {
             >
               {renderHead}
               {renderContent}
+              <Typography>v{process.env.REACT_APP_VERSION}</Typography>
             </Box>
           </Box>
         </Container>
       </Box>
-      
+
       {/* Left Side - Image Section */}
       <Box
         sx={{
@@ -115,6 +116,7 @@ export default function AuthClassicLayout({ children }) {
             backgroundPosition: "center",
           }}
         />
+        <Typography>157</Typography>
       </Box>
     </Box>
   );

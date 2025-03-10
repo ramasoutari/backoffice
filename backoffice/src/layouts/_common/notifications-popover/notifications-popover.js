@@ -13,34 +13,34 @@ import { TableNoData } from "../../../components/table";
 import { paths } from "../../../routes/paths";
 import { RouterLink } from "../../../routes/components";
 import SvgColor from "../../../components/svg-color";
-import {
-  useGetUserUnreadNotifications,
-  useMarkNotificationsAsRead,
-} from "../../../api/notifications.api";
-import { useNotification } from "../../../providers/notifications.provider";
+// import {
+//   useGetUserUnreadNotifications,
+//   useMarkNotificationsAsRead,
+// } from "../../../api/notifications.api";
+// import { useNotification } from "../../../providers/notifications.provider";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 
 export default function NotificationsPopover() {
   const drawer = useBoolean();
   const { refetchUser } = useAuthContext();
-  const { notificationTrigger } = useNotification();
+  // const { notificationTrigger } = useNotification();
   const { t } = useLocales();
 
   const smUp = useResponsive("up", "sm");
 
-  const getLatestUnreadNotifications = useGetUserUnreadNotifications(true);
-  const setNotificationsAsRead = useMarkNotificationsAsRead();
+  // const getLatestUnreadNotifications = useGetUserUnreadNotifications(true);
+  // const setNotificationsAsRead = useMarkNotificationsAsRead();
 
-  const latestUnreadNotifications = useMemo(() => {
-    return getLatestUnreadNotifications.data || [];
-  }, [getLatestUnreadNotifications.data]);
+  // const latestUnreadNotifications = useMemo(() => {
+  //   return getLatestUnreadNotifications.data || [];
+  // }, [getLatestUnreadNotifications.data]);
 
-  useEffect(() => {
-    if (notificationTrigger) {
-      refetchUser();
-      getLatestUnreadNotifications.refetch();
-    }
-  }, [notificationTrigger]);
+  // useEffect(() => {
+  //   if (notificationTrigger) {
+  //     refetchUser();
+  //     getLatestUnreadNotifications.refetch();
+  //   }
+  // }, [notificationTrigger]);
 
   const renderHead = (
     <Stack
@@ -61,7 +61,7 @@ export default function NotificationsPopover() {
   const renderList = (
     <Scrollbar>
       <List disablePadding>
-        {latestUnreadNotifications.length > 0 ? (
+        {/* {latestUnreadNotifications.length > 0 ? (
           <>
             {latestUnreadNotifications.map((item, index) => (
               <NotificationItem
@@ -79,7 +79,7 @@ export default function NotificationsPopover() {
           </>
         ) : (
           <TableNoData notFound text={t("empty_notifications")} />
-        )}
+        )} */}
       </List>
     </Scrollbar>
   );

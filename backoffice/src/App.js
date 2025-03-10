@@ -19,7 +19,6 @@ import { MotionLazy } from "./animate/motion-lazy";
 import ReactQueryProvider from "./providers/react-query-provider";
 import { AuthConsumer } from "./auth/context/auth-consumer";
 import "./index.css";
-import { NotificationProvider } from "./providers/notifications.provider";
 
 // ----------------------------------------------------------------------
 
@@ -99,9 +98,7 @@ export default function App() {
                             <ProgressBar />
                           </MotionLazy>
                           <AuthConsumer>
-                            <NotificationProvider>
-                              <Router />
-                            </NotificationProvider>
+                            <Router />
                           </AuthConsumer>
                         </GlobalDrawerProvider>
                       </GlobalPromptProvider>

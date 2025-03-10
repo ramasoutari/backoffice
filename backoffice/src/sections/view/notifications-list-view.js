@@ -1,27 +1,34 @@
 // @mui
-import { Container, Card, CardHeader, Box, Typography, Stack } from '@mui/material';
-// hooks
-import { useRouter, useSearchParams } from 'src/routes/hooks';
-import { useLocales } from 'src/locales';
-import { useSettingsContext } from 'src/components/settings';
-// components
-import Table, { useTable } from 'src/components/table';
-import { StyledActionButton } from 'src/components/custom-styled-components';
-import Label from 'src/components/label/label';
-//
-import { NotificationType, ROWS_PER_PAGE_OPTIONS } from 'src/config-global';
-import moment from 'moment-timezone';
 import {
-  useGetUserNotifications,
-  useMarkNotificationsAsRead,
-  useMarkNotificationsAsUnread,
-} from 'src/api/notifications.api';
-import { useFilters } from 'src/hooks/use-filters';
-import FilterResults from 'src/components/filter-results';
-import { getNotificationStatusStyles } from 'src/sections/tasks/view/utils';
-import { paths } from 'src/routes/paths';
-import { useNotification } from 'src/providers/notifications.provider';
-import { useEffect } from 'react';
+  Container,
+  Card,
+  CardHeader,
+  Box,
+  Typography,
+  Stack,
+} from "@mui/material";
+// hooks
+import { useRouter, useSearchParams } from "src/routes/hooks";
+import { useLocales } from "src/locales";
+import { useSettingsContext } from "src/components/settings";
+// components
+import Table, { useTable } from "src/components/table";
+import { StyledActionButton } from "src/components/custom-styled-components";
+import Label from "src/components/label/label";
+//
+import { NotificationType, ROWS_PER_PAGE_OPTIONS } from "src/config-global";
+import moment from "moment-timezone";
+// import {
+//   useGetUserNotifications,
+//   useMarkNotificationsAsRead,
+//   useMarkNotificationsAsUnread,
+// } from 'src/api/notifications.api';
+import { useFilters } from "src/hooks/use-filters";
+import FilterResults from "src/components/filter-results";
+import { getNotificationStatusStyles } from "src/sections/tasks/view/utils";
+import { paths } from "src/routes/paths";
+import { useNotification } from "src/providers/notifications.provider";
+import { useEffect } from "react";
 
 // ----------------------------------------------------------------------
 
@@ -30,26 +37,27 @@ export default function NotificationsListView() {
   const router = useRouter();
   const settings = useSettingsContext();
   const { notificationTrigger } = useNotification();
-  const { searchParams, changeSearchParam, setSearchParams } = useSearchParams();
-  const currentPage = searchParams.get('page') || 1;
-  const rowsPerPage = searchParams.get('rows') || ROWS_PER_PAGE_OPTIONS[0];
-  const sortBy = searchParams.get('sortBy');
-  const sort = searchParams.get('sort');
+  const { searchParams, changeSearchParam, setSearchParams } =
+    useSearchParams();
+  const currentPage = searchParams.get("page") || 1;
+  const rowsPerPage = searchParams.get("rows") || ROWS_PER_PAGE_OPTIONS[0];
+  const sortBy = searchParams.get("sortBy");
+  const sort = searchParams.get("sort");
   const { filters, handleChangeFilter } = useFilters();
-  const setNotificationsAsRead = useMarkNotificationsAsRead();
-  const setNotificationsAsUnread = useMarkNotificationsAsUnread();
+  // const setNotificationsAsRead = useMarkNotificationsAsRead();
+  // const setNotificationsAsUnread = useMarkNotificationsAsUnread();
 
-  const getNotifications = useGetUserNotifications({
-    page: currentPage,
-    pageSize: rowsPerPage,
-    filters,
-    sortBy,
-    sort,
-  });
+  // const getNotifications = useGetUserNotifications({
+  //   page: currentPage,
+  //   pageSize: rowsPerPage,
+  //   filters,
+  //   sortBy,
+  //   sort,
+  // });
   const table = useTable({
     defaultDense: false,
-    defaultOrder: 'asc',
-    defaultOrderBy: 'id',
+    defaultOrder: "asc",
+    defaultOrderBy: "id",
     defaultCurrentPage: 0,
     defaultRowsPerPage: ROWS_PER_PAGE_OPTIONS[0],
     defaultSelected: [],
@@ -71,25 +79,29 @@ export default function NotificationsListView() {
   //   });
   // };
 
-  const goToCaseProfile = (row) => {
-    // Set notification as read
-    onSetAsReadClick([row.id]);
+  // const goToCaseProfile = (row) => {
+  //   // Set notification as read
+  //   onSetAsReadClick([row.id]);
 
-    // Redirect to profile
-    router.push(
-      paths.dashboard.investigationProfile.savedProfile(row?.data?.investigationProfileId)
-    );
-  };
+  //   // Redirect to profile
+  //   router.push(
+  //     paths.dashboard.investigationProfile.savedProfile(
+  //       row?.data?.investigationProfileId
+  //     )
+  //   );
+  // };
 
-  const goToSavedProfile = (row) => {
-    // Set notification as read
-    onSetAsReadClick([row.id]);
+  // const goToSavedProfile = (row) => {
+  //   // Set notification as read
+  //   onSetAsReadClick([row.id]);
 
-    // Redirect to profile
-    router.push(
-      paths.dashboard.investigationProfile.savedProfile(row?.data?.investigationProfileId)
-    );
-  };
+  //   // Redirect to profile
+  //   router.push(
+  //     paths.dashboard.investigationProfile.savedProfile(
+  //       row?.data?.investigationProfileId
+  //     )
+  //   );
+  // };
 
   const renderNotificationActions = (row) => {
     return (
@@ -135,8 +147,8 @@ export default function NotificationsListView() {
   // ** Vars
   const columns = [
     {
-      id: 'message',
-      label: t('notification'),
+      id: "message",
+      label: t("notification"),
       minWidth: 500,
       renderRow: (row, column) => (
         <Stack direction="column" spacing={1}>
@@ -148,31 +160,31 @@ export default function NotificationsListView() {
       ),
     },
     {
-      id: 'created_at',
-      label: t('date_and_time'),
+      id: "created_at",
+      label: t("date_and_time"),
       sortable: true,
       minWidth: 150,
-      align: 'right',
+      align: "right",
       renderRow: (row) => (
         <Typography variant="body2" noWrap>
-          {moment(row.created_at).format('YYYY-MM-DD - HH:mm')}
+          {moment(row.created_at).format("YYYY-MM-DD - HH:mm")}
         </Typography>
       ),
     },
     {
-      id: 'isRead',
-      label: t('status'),
+      id: "isRead",
+      label: t("status"),
       sortable: true,
       minWidth: 100,
-      align: 'right',
+      align: "right",
       renderRow: (row, column) => (
         <Label
           variant="ghost"
           sx={{
-            ...getNotificationStatusStyles(row.isRead ? 'READ' : 'UNREAD'),
+            ...getNotificationStatusStyles(row.isRead ? "READ" : "UNREAD"),
           }}
         >
-          {row.isRead ? t('read') : t('not_read')}
+          {row.isRead ? t("read") : t("not_read")}
         </Label>
       ),
     },
@@ -186,47 +198,47 @@ export default function NotificationsListView() {
 
   const availableFilters = [
     {
-      key: 'created_at',
-      label: t('date_and_time'),
-      type: 'date',
+      key: "created_at",
+      label: t("date_and_time"),
+      type: "date",
       range: true,
-      defaultValue: '',
+      defaultValue: "",
     },
   ];
 
-  const onSetAsReadClick = (ids) => {
-    setNotificationsAsRead.mutateAsync({
-      ids,
-    });
-    table.setSelected([]);
-  };
+  // const onSetAsReadClick = (ids) => {
+  //   setNotificationsAsRead.mutateAsync({
+  //     ids,
+  //   });
+  //   table.setSelected([]);
+  // };
 
-  const onSetAsUnreadClick = (ids) => {
-    setNotificationsAsUnread.mutateAsync({
-      ids,
-    });
-    table.setSelected([]);
-  };
+  // const onSetAsUnreadClick = (ids) => {
+  //   setNotificationsAsUnread.mutateAsync({
+  //     ids,
+  //   });
+  //   table.setSelected([]);
+  // };
 
-  useEffect(() => {
-    if (notificationTrigger) {
-      getNotifications.refetch();
-    }
-  }, [notificationTrigger]);
+  // useEffect(() => {
+  //   if (notificationTrigger) {
+  //     getNotifications.refetch();
+  //   }
+  // }, [notificationTrigger]);
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'xl'}>
+    <Container maxWidth={settings.themeStretch ? false : "xl"}>
       <Card>
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
             gap: 1,
             mt: 4,
           }}
         >
-          <CardHeader title={t('notifications_center')} />
+          <CardHeader title={t("notifications_center")} />
           <Stack direction="row" spacing={1}>
             <FilterResults
               filters={availableFilters}
@@ -236,7 +248,7 @@ export default function NotificationsListView() {
             />
           </Stack>
         </Box>
-        <Table
+        {/* <Table
           {...table}
           columns={columns}
           rows={getNotifications?.data?.data || []}
@@ -341,7 +353,7 @@ export default function NotificationsListView() {
             });
           }}
           loading={getNotifications?.isFetching}
-        />
+        /> */}
       </Card>
     </Container>
   );

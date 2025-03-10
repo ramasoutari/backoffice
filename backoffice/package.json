@@ -1,6 +1,6 @@
 {
   "name": "backoffice",
-  "version": "0.1.0",
+  "version": "0.0.2",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -61,8 +61,10 @@
     "yup": "^1.6.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "prestart": "node scripts/update-env.js",
+    "prebuild": "node scripts/update-env.js",
+    "start": "npm run prestart && react-scripts start",
+    "build": " npm run prebuild &&react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

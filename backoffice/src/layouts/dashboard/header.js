@@ -28,7 +28,6 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import TranslateIcon from "@mui/icons-material/Translate";
 import NotificationsPopover from "../_common/notifications-popover/notifications-popover";
-import { useNotification } from "../../providers/notifications.provider";
 import { useSkipFirstRender } from "../../hooks/use-skip-first-render";
 import toast from "react-hot-toast";
 
@@ -53,7 +52,7 @@ export default function Header({ onOpenNav }) {
   const smUp = useResponsive("up", "sm");
 
   const offset = useOffSetTop(HEADER.H_DESKTOP);
-  const { notificationTrigger, notifications } = useNotification();
+  // const { notificationTrigger, notifications } = useNotification();
 
   const offsetTop = offset && !isNavHorizontal;
   const direction = i18n.language === "ar" ? "rtl" : "ltr";
@@ -173,39 +172,39 @@ export default function Header({ onOpenNav }) {
       </Stack>
     </>
   );
-  useSkipFirstRender(() => {
-    if (notifications?.[notifications.length - 1]?.message) {
-      toast.custom(
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            bgcolor: "background.paper",
-            color: "text.primary",
-            p: 2,
-            borderRadius: 2,
-            boxShadow: 3,
-            maxWidth: "350px",
-            border: "1px solid",
-            borderColor: "divider",
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-              {notifications?.[notifications.length - 1]?.message}
-            </Typography>
-          </Box>
-          {/* <IconButton size="small" onClick={() => toast.dismiss(t.id)}>
-          </IconButton> */}
-        </Box>,
-        {
-          duration: 5000,
-          position: "bottom-left",
-        }
-      );
-    }
-  }, [notificationTrigger]);
+  // useSkipFirstRender(() => {
+  //   if (notifications?.[notifications.length - 1]?.message) {
+  //     toast.custom(
+  //       <Box
+  //         sx={{
+  //           display: "flex",
+  //           alignItems: "center",
+  //           justifyContent: "space-between",
+  //           bgcolor: "background.paper",
+  //           color: "text.primary",
+  //           p: 2,
+  //           borderRadius: 2,
+  //           boxShadow: 3,
+  //           maxWidth: "350px",
+  //           border: "1px solid",
+  //           borderColor: "divider",
+  //         }}
+  //       >
+  //         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+  //           <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+  //             {notifications?.[notifications.length - 1]?.message}
+  //           </Typography>
+  //         </Box>
+  //         {/* <IconButton size="small" onClick={() => toast.dismiss(t.id)}>
+  //         </IconButton> */}
+  //       </Box>,
+  //       {
+  //         duration: 5000,
+  //         position: "bottom-left",
+  //       }
+  //     );
+  //   }
+  // }, [notificationTrigger]);
 
   return (
     <Box dir={direction}>
