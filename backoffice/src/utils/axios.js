@@ -1,6 +1,5 @@
 import axios from "axios";
 import { HOST_API } from "../config-global";
-import { Construction } from "lucide-react";
 // config
 
 // ----------------------------------------------------------------------
@@ -26,6 +25,28 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     // return Promise.reject(error);
+  }
+);
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    const { url } = config;
+
+    if (url.includes("login") || url.includes("forget-password")) {
+      try {
+        const response = await axiosInstance.post(
+          `${HOST_API}/GenerateGuestToken`
+        );
+        const guestToken = response?.data;
+        config.headers["x-guest-token"] = guestToken;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
 );
 
